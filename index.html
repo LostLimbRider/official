@@ -357,6 +357,19 @@
     .guest-entry small { color: #8f8f8f; display: block; margin-top: 4px; }
     .guest-entry p { margin: 10px 0 0; color: #d7d7d7; }
 
+    .newsletter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+    .newsletter-status {
+      grid-column: 1 / -1;
+      min-height: 20px;
+      color: var(--orange);
+      font-weight: 800;
+    }
+
     footer {
       padding: 34px 7vw;
       color: #858585;
@@ -367,7 +380,7 @@
     @media (max-width: 940px) {
       .nav { position: static; align-items: flex-start; flex-direction: column; }
       .nav-links { flex-wrap: wrap; }
-      .hero, .grid, .split, .form, .two-column { grid-template-columns: 1fr; }
+      .hero, .grid, .split, .form, .two-column, .newsletter-row { grid-template-columns: 1fr; }
       .hero { min-height: auto; background-position: center bottom; }
       .book-card { grid-template-columns: 150px 1fr; }
     }
@@ -390,6 +403,7 @@
     </a>
 
     <div class="nav-links">
+      <a href="events.html">Events</a>
       <a href="mission.html">Mission</a>
       <a href="#keynote">Book John</a>
       <a href="#book">Book</a>
@@ -411,7 +425,7 @@
     </div>
 
     <aside class="hero-card" aria-labelledby="freedom-title">
-      <img src="assets/logo.png" alt="Lost Limb Riders motorcycle logo">
+      <img src="assets/logo-nobg.png" alt="Lost Limb Riders motorcycle logo">
       <h2 id="freedom-title">Lost Limbs.<br><span class="orange">Found Freedom.</span></h2>
       <div class="check"><b>✓</b><span>Support amputees rebuilding independence and confidence.</span></div>
       <div class="check"><b>✓</b><span>Build brotherhood and sisterhood through motorcycle culture.</span></div>
@@ -529,6 +543,21 @@
       </div>
     </section>
 
+    <section id="newsletter">
+      <div class="wrap panel" style="text-align:center;">
+        <h2 class="section-title">Join the <span class="orange">Ride</span></h2>
+        <p class="lead" style="max-width:600px; margin:0 auto 28px;">Get updates on events, rides, podcasts, and the mission. No spam. Just the good stuff — straight to your inbox.</p>
+        <form id="newsletterForm" style="max-width:560px; margin:0 auto;">
+          <div class="newsletter-row">
+            <input id="nlName" autocomplete="name" placeholder="Full name" required>
+            <input id="nlEmail" type="email" autocomplete="email" placeholder="Email address" required>
+            <button type="submit" style="white-space:nowrap;">Subscribe</button>
+          </div>
+          <div id="nlStatus" class="newsletter-status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
     <section id="contact">
       <div class="wrap panel">
         <h2 class="section-title">Become Part of <span class="orange">the Ride</span></h2>
@@ -620,6 +649,46 @@
     });
 
     renderEntries();
+
+    const nlForm = document.getElementById('newsletterForm');
+    const nlStatus = document.getElementById('nlStatus');
+    nlForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('nlName').value.trim();
+      const email = document.getElementById('nlEmail').value.trim();
+      if (!name || !email) { nlStatus.textContent = 'Please enter your name and email.'; return; }
+      nlStatus.textContent = 'Subscribing...';
+      try {
+        const res = await fetch('api/newsletter.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+        const data = await res.json();
+        nlStatus.textContent = data.message || (data.ok ? 'Subscribed!' : 'Something went wrong.');
+        if (data.ok) nlForm.reset();
+      } catch (err) {
+        nlStatus.textContent = 'Network error. Please try again.';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const payload = {
+        screen: screen.width + 'x' + screen.height,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        lang: navigator.language,
+        platform: navigator.platform,
+        cookies: navigator.cookieEnabled ? 'enabled' : 'disabled',
+        dnt: navigator.doNotTrack || 'unknown',
+        page: location.href
+      };
+      fetch('api/visit.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(() => {});
+    });
   </script>
 </body>
 </html>
