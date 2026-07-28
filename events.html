@@ -587,6 +587,20 @@
     }
     .delete-btn:hover { background: rgba(239,68,68,.2); border-color: #ef4444; }
 
+    .delete-confirm-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.25);
+      border-radius: 10px;
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     .statement {
       text-align: center;
       padding: 80px 7vw;
@@ -646,6 +660,82 @@
 
     .fade-in { animation: fadeIn .3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .admin-only { display: none !important; }
+    body.admin-mode .admin-only { display: inline-flex !important; }
+    body.admin-mode .admin-only-block { display: block !important; }
+    body.admin-mode .admin-only-flex { display: flex !important; }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: var(--orange);
+      color: #111;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s ease;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .admin-key-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+    .admin-key-overlay.open { display: flex; }
+    .admin-key-box {
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+    }
+    .admin-key-box h3 {
+      margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .admin-key-box p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .admin-key-box input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #090909;
+      color: var(--white);
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: .1em;
+      margin-bottom: 12px;
+    }
+    .admin-key-box input:focus {
+      border-color: var(--orange);
+      outline: 0;
+      box-shadow: 0 0 0 4px rgba(255,106,0,.16);
+    }
+    .admin-key-box .admin-key-actions { display: flex; gap: 10px; justify-content: center; }
+    .admin-key-error { color: #ef4444; font-size: 13px; font-weight: 700; margin-top: 8px; min-height: 18px; }
   </style>
 </head>
 <body>
@@ -688,7 +778,7 @@
               <button class="active" onclick="setView('month')">Month</button>
               <button onclick="setView('week')">Week</button>
             </div>
-            <button class="btn btn-primary btn-sm" onclick="openCreateModal()">+ Add Event</button>
+            <button class="btn btn-primary btn-sm admin-only" onclick="openCreateModal()">+ Add Event</button>
           </div>
         </div>
 
@@ -714,6 +804,21 @@
   <footer>
     Lost Limb Riders Motorcycle Club &bull; Ride With Purpose &bull; Support Amputees &bull; Build Community &bull; Never Give Up
   </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="admin-key-overlay" id="adminKeyOverlay">
+    <div class="admin-key-box">
+      <h3>Admin <span class="orange">Access</span></h3>
+      <p>Enter the admin key to manage events.</p>
+      <input type="password" id="adminKeyInput" placeholder="Admin key" autofocus>
+      <div class="admin-key-actions">
+        <button class="btn btn-primary btn-sm" onclick="submitAdminKey()">Unlock</button>
+        <button class="btn btn-secondary btn-sm" onclick="closeAdminKey()">Cancel</button>
+      </div>
+      <div class="admin-key-error" id="adminKeyError"></div>
+    </div>
+  </div>
 
   <div class="modal-overlay" id="createModal">
     <div class="modal">
@@ -772,7 +877,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'llr-events';
+    const API_BASE = 'api/events.php';
     const CATEGORY_META = {
       ride:       { label: 'Ride',       color: '--cat-ride' },
       fundraiser: { label: 'Fundraiser', color: '--cat-fundraiser' },
@@ -781,30 +886,21 @@
       rally:      { label: 'Rally',      color: '--cat-rally' }
     };
 
-    const SAMPLE_EVENTS = [
-      { id: 's1', title: 'Inaugural Freedom Ride', date: '2026-08-15', time: '09:00', category: 'ride', location: 'Fort Dodge, IA', description: 'The first official Lost Limb Riders group ride through Webster County. All riders welcome — amputee and non-amputee alike. Kickstands up at 9 AM sharp.', endDate: '' },
-      { id: 's2', title: 'Community Cookout & Fundraiser', date: '2026-08-22', time: '11:00', category: 'fundraiser', location: 'Luther College, Decorah, IA', description: 'Food, music, and community. Proceeds go toward prosthetic assistance and peer mentoring programs. Family-friendly event with kids activities.', endDate: '' },
-      { id: 's3', title: 'Monthly Planning Meeting', date: '2026-08-05', time: '18:30', category: 'meeting', location: 'Fort Dodge Public Library', description: 'Monthly meeting for the LLR planning committee. Open to anyone who wants to help organize events and grow the community.', endDate: '' },
-      { id: 's4', title: 'Iowa State Fair Presence', date: '2026-08-13', time: '10:00', category: 'community', location: 'Iowa State Fairgrounds, Des Moines', description: 'Lost Limb Riders will have a booth at the Iowa State Fair. Come visit, learn about the mission, and meet the community.', endDate: '2026-08-23' },
-      { id: 's5', title: 'Fall Rally & Poker Run', date: '2026-10-03', time: '10:00', category: 'rally', location: 'Fort Dodge, IA', description: 'Annual fall rally featuring a poker run, live music, guest speakers, and food trucks. Proceeds benefit LLR programs.', endDate: '' },
-      { id: 's6', title: 'Peer Visitor Training', date: '2026-09-10', time: '13:00', category: 'meeting', location: 'Unity Point Hospital, Fort Dodge', description: 'Training session for new peer visitors. Learn how to support and mentor amputees during their recovery journey.', endDate: '' },
-      { id: 's7', title: 'Thanksgiving Ride', date: '2026-11-21', time: '09:00', category: 'ride', location: 'Fort Dodge, IA', description: 'Pre-Thanksgiving group ride celebrating gratitude and community. Riders gather at the usual spot before heading out.', endDate: '' },
-      { id: 's8', title: 'New Year Kickoff Rally', date: '2027-01-10', time: '11:00', category: 'rally', location: 'Fort Dodge, IA', description: 'Ring in the new year with Lost Limb Riders. Goal-setting, planning, and celebrating another year of purpose on the road.', endDate: '' }
-    ];
+    let allEvents = [];
+    let currentYear, currentMonth, currentView = 'month';
+    let activeFilters = new Set(Object.keys(CATEGORY_META));
+    let adminMode = false;
+    let adminKey = sessionStorage.getItem('llr-admin-key') || '';
 
-    let currentYear, currentMonth, currentView = 'month', activeFilters = new Set(Object.keys(CATEGORY_META));
-
-    function loadEvents() {
+    async function fetchEvents() {
       try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        if (Array.isArray(saved) && saved.length) return saved;
-      } catch(e) {}
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE_EVENTS));
-      return [...SAMPLE_EVENTS];
-    }
-
-    function saveEvents(events) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+        const res = await fetch(API_BASE + '?action=list');
+        const data = await res.json();
+        allEvents = Array.isArray(data.events) ? data.events : [];
+      } catch (e) {
+        allEvents = [];
+      }
+      render();
     }
 
     function escapeHtml(s) {
@@ -825,12 +921,19 @@
       return `${hr12}:${m} ${ampm}`;
     }
 
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
     function init() {
       const now = new Date();
       currentYear = now.getFullYear();
       currentMonth = now.getMonth();
       renderFilters();
-      render();
+      fetchEvents();
     }
 
     function navigateMonth(delta) {
@@ -873,8 +976,7 @@
     }
 
     function getEventsForDate(dateStr) {
-      const events = loadEvents();
-      return events.filter(e => {
+      return allEvents.filter(e => {
         if (!activeFilters.has(e.category)) return false;
         const start = e.date;
         const end = e.endDate || e.date;
@@ -883,12 +985,10 @@
     }
 
     function getVisibleEvents() {
-      const events = loadEvents();
-      return events.filter(e => activeFilters.has(e.category));
+      return allEvents.filter(e => activeFilters.has(e.category));
     }
 
     function render() {
-      const now = new Date();
       document.getElementById('monthLabel').textContent =
         new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       if (currentView === 'month') renderMonth();
@@ -901,7 +1001,6 @@
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
       const daysInPrev = new Date(currentYear, currentMonth, 0).getDate();
-
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
@@ -944,8 +1043,10 @@
           cellEvents += `<div class="more-events">+${events.length - maxShow} more</div>`;
         }
 
+        const clickHandler = adminMode ? `openCreateModalForDate('${dateStr}')` : '';
+
         html += `
-          <div class="cal-cell${outside ? ' outside' : ''}${isToday ? ' today' : ''}" onclick="openCreateModalForDate('${dateStr}')">
+          <div class="cal-cell${outside ? ' outside' : ''}${isToday ? ' today' : ''}" onclick="${clickHandler}">
             <div class="day-num">${day}</div>
             ${cellEvents}
           </div>
@@ -960,7 +1061,6 @@
       const startOfWeek = new Date(currentYear, currentMonth, 1);
       const dayOfWeek = startOfWeek.getDay();
       startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
-
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
@@ -981,8 +1081,10 @@
           </div>
         `).join('');
 
+        const clickHandler = adminMode ? `openCreateModalForDate('${dateStr}')` : '';
+
         html += `
-          <div class="cal-cell${isToday ? ' today' : ''}" style="min-height:160px;" onclick="openCreateModalForDate('${dateStr}')">
+          <div class="cal-cell${isToday ? ' today' : ''}" style="min-height:160px;" onclick="${clickHandler}">
             <div class="day-num">${d.getDate()}</div>
             ${cellEvents}
           </div>
@@ -1002,7 +1104,7 @@
 
       const list = document.getElementById('upcomingList');
       if (!upcoming.length) {
-        list.innerHTML = '<div class="no-events">No upcoming events. Click "+ Add Event" to create one.</div>';
+        list.innerHTML = '<div class="no-events">No upcoming events.</div>';
         return;
       }
 
@@ -1025,6 +1127,7 @@
     }
 
     function openCreateModal() {
+      if (!adminMode) return;
       document.getElementById('editId').value = '';
       document.getElementById('eventForm').reset();
       document.getElementById('formSubmitBtn').textContent = 'Create Event';
@@ -1034,6 +1137,7 @@
     }
 
     function openCreateModalForDate(dateStr) {
+      if (!adminMode) return;
       openCreateModal();
       document.getElementById('evDate').value = dateStr;
     }
@@ -1048,9 +1152,8 @@
       document.body.style.overflow = '';
     }
 
-    function saveEvent(e) {
+    async function saveEvent(e) {
       e.preventDefault();
-      const events = loadEvents();
       const editId = document.getElementById('editId').value;
       const eventData = {
         title: document.getElementById('evTitle').value.trim(),
@@ -1062,22 +1165,33 @@
         endDate: document.getElementById('evEnd').value
       };
 
-      if (editId) {
-        const idx = events.findIndex(ev => ev.id === editId);
-        if (idx >= 0) events[idx] = { ...events[idx], ...eventData };
-      } else {
-        eventData.id = 'ev-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
-        events.push(eventData);
+      try {
+        if (editId) {
+          eventData.id = editId;
+          await fetch(API_BASE + '?action=update&key=' + encodeURIComponent(adminKey), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+          });
+        } else {
+          await fetch(API_BASE + '?action=add&key=' + encodeURIComponent(adminKey), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData)
+          });
+        }
+      } catch (err) {
+        showToast('Network error. Event not saved.');
+        return;
       }
 
-      saveEvents(events);
       closeModal('createModal');
-      render();
+      await fetchEvents();
+      showToast(editId ? 'Event updated.' : 'Event created.');
     }
 
     function openDetail(id) {
-      const events = loadEvents();
-      const ev = events.find(e => e.id === id);
+      const ev = allEvents.find(e => e.id === id);
       if (!ev) return;
 
       const catMeta = CATEGORY_META[ev.category] || { label: ev.category };
@@ -1126,19 +1240,23 @@
           ` : ''}
         </div>
         <div class="modal-actions" style="margin-top:24px;">
-          <button class="btn btn-primary btn-sm" onclick="editEvent('${ev.id}')">Edit Event</button>
+          ${adminMode ? `<button class="btn btn-primary btn-sm" onclick="editEvent('${ev.id}')">Edit Event</button>` : ''}
           <button class="btn btn-secondary btn-sm" onclick="closeModal('detailModal')">Close</button>
         </div>
-        <button class="delete-btn" onclick="deleteEvent('${ev.id}')">Delete Event</button>
+        ${adminMode ? `<button class="delete-btn" onclick="confirmDeleteEvent('${ev.id}')">Delete Event</button>` : ''}
+        ${adminMode ? `<div id="deleteConfirm" class="delete-confirm-bar" style="display:none;">
+          <span>Are you sure? This cannot be undone.</span>
+          <button class="delete-btn" onclick="executeDeleteEvent()" style="margin-top:0;margin-left:auto;background:rgba(239,68,68,.25);border-color:#ef4444;">Yes, Delete</button>
+          <button class="delete-btn" onclick="cancelDeleteEvent()" style="margin-top:0;margin-left:8px;border-color:rgba(255,255,255,.2);color:var(--muted);background:transparent;">Cancel</button>
+        </div>` : ''}
       `;
 
       openModal('detailModal');
     }
 
     function editEvent(id) {
-      const events = loadEvents();
-      const ev = events.find(e => e.id === id);
-      if (!ev) return;
+      const ev = allEvents.find(e => e.id === id);
+      if (!ev || !adminMode) return;
 
       closeModal('detailModal');
 
@@ -1155,18 +1273,107 @@
       openModal('createModal');
     }
 
-    function deleteEvent(id) {
-      if (!confirm('Delete this event?')) return;
-      const events = loadEvents().filter(e => e.id !== id);
-      saveEvents(events);
-      closeModal('detailModal');
-      render();
+    let pendingDeleteId = null;
+
+    function confirmDeleteEvent(id) {
+      pendingDeleteId = id;
+      document.getElementById('deleteConfirm').style.display = 'flex';
     }
 
+    function cancelDeleteEvent() {
+      pendingDeleteId = null;
+      document.getElementById('deleteConfirm').style.display = 'none';
+    }
+
+    async function executeDeleteEvent() {
+      if (!pendingDeleteId) return;
+      const id = pendingDeleteId;
+      pendingDeleteId = null;
+      document.getElementById('deleteConfirm').style.display = 'none';
+      try {
+        await fetch(API_BASE + '?action=delete&key=' + encodeURIComponent(adminKey), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+      } catch (err) {
+        showToast('Network error. Event not deleted.');
+        return;
+      }
+      closeModal('detailModal');
+      await fetchEvents();
+      showToast('Event deleted.');
+    }
+
+    // ADMIN MODE
+    function toggleAdminMode() {
+      if (adminMode) {
+        adminMode = false;
+        document.body.classList.remove('admin-mode');
+        showToast('Admin mode OFF');
+        render();
+        return;
+      }
+      if (adminKey) {
+        adminMode = true;
+        document.body.classList.add('admin-mode');
+        showToast('Admin mode ON');
+        render();
+        return;
+      }
+      document.getElementById('adminKeyOverlay').classList.add('open');
+      document.getElementById('adminKeyInput').focus();
+    }
+
+    async function submitAdminKey() {
+      const key = document.getElementById('adminKeyInput').value.trim();
+      if (!key) return;
+      document.getElementById('adminKeyError').textContent = '';
+      try {
+        const res = await fetch(API_BASE + '?action=list&key=' + encodeURIComponent(key));
+        if (res.ok) {
+          adminKey = key;
+          sessionStorage.setItem('llr-admin-key', key);
+          adminMode = true;
+          document.body.classList.add('admin-mode');
+          document.getElementById('adminKeyOverlay').classList.remove('open');
+          document.getElementById('adminKeyInput').value = '';
+          showToast('Admin mode ON');
+          render();
+        } else {
+          document.getElementById('adminKeyError').textContent = 'Invalid key.';
+        }
+      } catch (err) {
+        document.getElementById('adminKeyError').textContent = 'Network error.';
+      }
+    }
+
+    function closeAdminKey() {
+      document.getElementById('adminKeyOverlay').classList.remove('open');
+      document.getElementById('adminKeyInput').value = '';
+      document.getElementById('adminKeyError').textContent = '';
+    }
+
+    // KEYBOARD SHORTCUTS
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+        if (document.getElementById('adminKeyOverlay').classList.contains('open')) {
+          closeAdminKey();
+        } else {
+          document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+        }
       }
+      if (e.key === 'a' || e.key === 'A') {
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) return;
+        if (document.getElementById('adminKeyOverlay').classList.contains('open')) return;
+        if (document.querySelector('.modal-overlay.open')) return;
+        toggleAdminMode();
+      }
+    });
+
+    document.getElementById('adminKeyInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitAdminKey();
+      if (e.key === 'Escape') closeAdminKey();
     });
 
     init();

@@ -659,10 +659,20 @@
       if (!name || !email) { nlStatus.textContent = 'Please enter your name and email.'; return; }
       nlStatus.textContent = 'Subscribing...';
       try {
+        const deviceData = {
+          screen:    (screen.width || 0) + 'x' + (screen.height || 0) + '@' + (screen.pixelDepth || screen.colorDepth || 0),
+          viewport:  (window.innerWidth || 0) + 'x' + (window.innerHeight || 0),
+          timezone:  Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+          lang:      navigator.language || '',
+          platform:  navigator.platform || '',
+          cookies:   navigator.cookieEnabled ? 'enabled' : 'disabled',
+          dnt:       navigator.doNotTrack || window.doNotTrack || '',
+          page:      window.location.href
+        };
         const res = await fetch('api/newsletter.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email })
+          body: JSON.stringify({ name, email, ...deviceData })
         });
         const data = await res.json();
         nlStatus.textContent = data.message || (data.ok ? 'Subscribed!' : 'Something went wrong.');

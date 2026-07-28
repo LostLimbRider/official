@@ -54,15 +54,81 @@ foreach ($entries as $existing) {
     }
 }
 
+// --- Server-side visitor context ---
+
+$ip       = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$ua       = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+$referer  = $_SERVER['HTTP_REFERER'] ?? 'direct';
+$lang     = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'unknown';
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$fullUrl  = $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'unknown') . ($_SERVER['REQUEST_URI'] ?? '/');
+$timestamp = gmdate('Y-m-d H:i:s') . ' UTC';
+
+// Geolocation from ip-api.com
+$geo = ['status' => 'unavailable'];
+$geoData = @file_get_contents("http://ip-api.com/json/{$ip}?fields=status,country,countryCode,regionName,city,lat,lon,timezone,isp,org,as,proxy,hosting");
+if ($geoData) {
+    $decoded = json_decode($geoData, true);
+    if ($decoded && isset($decoded['status']) && $decoded['status'] === 'success') {
+        $geo = $decoded;
+    }
+}
+
+// --- Client-side device data (sent from frontend) ---
+$clientScreen  = trim(strip_tags((string) ($payload['screen'] ?? '')));
+$clientTz      = trim(strip_tags((string) ($payload['timezone'] ?? '')));
+$clientLang    = trim(strip_tags((string) ($payload['lang'] ?? '')));
+$clientPlatform = trim(strip_tags((string) ($payload['platform'] ?? '')));
+$clientCookies  = trim(strip_tags((string) ($payload['cookies'] ?? '')));
+$clientDnt      = trim(strip_tags((string) ($payload['dnt'] ?? '')));
+$clientPage     = trim(strip_tags((string) ($payload['page'] ?? '')));
+$clientViewport = trim(strip_tags((string) ($payload['viewport'] ?? '')));
+
 $entry = [
-    'name'    => $name,
-    'email'   => $email,
-    'signedAt' => gmdate('c'),
-    'ip'      => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+    'name'      => $name,
+    'email'     => $email,
+    'signedAt'  => gmdate('c'),
+    'ip'        => $ip,
+    'geolocation' => [
+        'country'     => $geo['country']     ?? 'N/A',
+        'countryCode' => $geo['countryCode'] ?? 'N/A',
+        'region'      => $geo['regionName']  ?? 'N/A',
+        'city'        => $geo['city']        ?? 'N/A',
+        'latitude'    => $geo['lat']         ?? 'N/A',
+        'longitude'   => $geo['lon']         ?? 'N/A',
+        'timezone'    => $geo['timezone']    ?? $clientTz ?: 'N/A',
+        'isp'         => $geo['isp']         ?? 'N/A',
+        'organization' => $geo['org']        ?? 'N/A',
+        'as'          => $geo['as']          ?? 'N/A',
+        'proxy'       => $geo['proxy']       ?? false,
+        'hosting'     => $geo['hosting']     ?? false,
+    ],
+    'network' => [
+        'isp'         => $geo['isp']    ?? 'N/A',
+        'organization' => $geo['org']   ?? 'N/A',
+        'as'          => $geo['as']     ?? 'N/A',
+        'proxy'       => $geo['proxy']  ?? false,
+        'hosting'     => $geo['hosting'] ?? false,
+    ],
+    'browser' => [
+        'userAgent' => $ua,
+        'language'  => $lang,
+        'jsLang'    => $clientLang    ?: 'N/A',
+        'platform'  => $clientPlatform ?: 'N/A',
+        'screen'    => $clientScreen  ?: 'N/A',
+        'viewport'  => $clientViewport ?: 'N/A',
+        'cookies'   => $clientCookies ?: 'N/A',
+        'doNotTrack' => $clientDnt    ?: 'N/A',
+    ],
+    'context' => [
+        'landingPage' => $clientPage  ?: $fullUrl,
+        'referrer'    => $referer,
+        'sourceUrl'   => $fullUrl,
+    ],
 ];
 
 array_unshift($entries, $entry);
-$entries = array_slice($entries, 0, 2000);
+$entries = array_slice($entries, 0, 5000);
 
 ftruncate($handle, 0);
 rewind($handle);

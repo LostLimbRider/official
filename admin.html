@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Lost Limb Riders</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    :root {
+      --orange: #ff6a00;
+      --orange-dark: #c94f00;
+      --black: #050505;
+      --charcoal: #101010;
+      --card: #171717;
+      --line: rgba(255,255,255,.14);
+      --muted: #b7b7b7;
+      --white: #ffffff;
+      --shadow: 0 24px 70px rgba(0,0,0,.45);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--black);
+      color: var(--white);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,106,0,.18), transparent 28rem),
+        radial-gradient(circle at 90% 18%, rgba(255,106,0,.12), transparent 26rem),
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 18rem);
+      z-index: -1;
+    }
+
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+    h1, h2, h3, p { margin-top: 0; }
+    .orange { color: var(--orange); }
+    .wrap { max-width: 1280px; margin: 0 auto; }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px 7vw;
+      background: rgba(5,5,5,.88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 220px;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .brand img { width: 54px; height: 54px; object-fit: contain; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #dedede;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--orange); }
+
+    .page-hero {
+      padding: 48px 7vw 28px;
+      text-align: center;
+    }
+
+    .page-hero h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900;
+      letter-spacing: .04em;
+    }
+
+    section { padding: 40px 7vw; }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--charcoal);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-card .num {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .stat-card .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-top: 8px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 12px 24px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color .15s, border-color .15s;
+    }
+
+    .tab-btn:hover { color: var(--white); }
+    .tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--charcoal);
+      color: var(--orange);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-size: 11px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      color: var(--muted);
+      vertical-align: top;
+      word-break: break-word;
+    }
+
+    tr:hover td { background: rgba(255,255,255,.03); }
+
+    .table-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-proxy { background: rgba(239,68,68,.2); color: #ef4444; }
+    .badge-hosting { background: rgba(245,158,11,.2); color: #f59e0b; }
+    .badge-clean { background: rgba(34,197,94,.15); color: #22c55e; }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 20px;
+      align-items: center;
+    }
+
+    .pagination button {
+      background: var(--charcoal);
+      border: 1px solid var(--line);
+      color: var(--white);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .pagination button:hover { border-color: var(--orange); color: var(--orange); }
+    .pagination button:disabled { opacity: .3; cursor: default; }
+    .pagination .page-info { color: var(--muted); font-size: 13px; }
+
+    .newsletter-section { margin-top: 16px; }
+
+    .newsletter-section textarea {
+      width: 100%;
+      min-height: 80px;
+      background: var(--charcoal);
+      border: 1px solid var(--line);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+
+    .newsletter-section textarea:focus { outline: none; border-color: var(--orange); }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform .12s, box-shadow .12s;
+    }
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+
+    .btn-primary {
+      background: var(--orange);
+      color: var(--white);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: var(--white);
+    }
+
+    .btn-sm {
+      padding: 6px 16px;
+      font-size: 12px;
+    }
+
+    #nlPreview {
+      background: var(--charcoal);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 16px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    #nlPreview iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      border-radius: 6px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 48px 20px;
+      font-size: 14px;
+    }
+
+    #loginOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(5,5,5,.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loginOverlay.hidden { display: none; }
+
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 40px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .login-box h2 { font-size: 22px; margin-bottom: 8px; }
+    .login-box p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--charcoal);
+      border: 1px solid var(--line);
+      color: var(--white);
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-family: monospace;
+      letter-spacing: .1em;
+    }
+
+    .login-box input:focus { outline: none; border-color: var(--orange); }
+
+    #loginError { color: #ef4444; font-size: 13px; margin-bottom: 12px; min-height: 18px; }
+
+    .chart-bar-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 120px;
+      padding-top: 10px;
+    }
+
+    .chart-bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .chart-bar {
+      width: 100%;
+      max-width: 48px;
+      background: var(--orange);
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: height .3s;
+    }
+
+    .chart-bar-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .chart-bar-num {
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 768px) {
+      section { padding: 24px 5vw; }
+      .panel { padding: 20px; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .tabs { overflow-x: auto; }
+      .tab-btn { padding: 10px 16px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login overlay -->
+  <div id="loginOverlay">
+    <div class="login-box">
+      <h2>Admin Access</h2>
+      <p>Enter your admin key to access the dashboard.</p>
+      <input id="loginKey" type="password" placeholder="Admin key" autofocus>
+      <div id="loginError"></div>
+      <button class="btn btn-primary" onclick="attemptLogin()" style="width:100%;">Enter</button>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="index.html" class="brand">
+      <img src="assets/logo.png" alt="Lost Limb Riders logo">
+      <span>Lost Limb<br>Riders</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="media.html">Media</a>
+      <a href="mission.html">Mission</a>
+      <a href="admin.html" style="color:var(--orange);">Admin</a>
+    </div>
+  </nav>
+
+  <div class="page-hero">
+    <h1><span class="orange">Admin</span> Dashboard</h1>
+    <p style="color:var(--muted); font-size:14px;">Visitor analytics, subscriber management, and newsletter sending.</p>
+  </div>
+
+  <section style="padding-top:0;">
+    <div class="wrap">
+
+      <!-- Stats -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="num" id="statVisits">–</div>
+          <div class="label">Total Visits</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statToday">–</div>
+          <div class="label">Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statSubs">–</div>
+          <div class="label">Subscribers</div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:32px;">
+        <div class="panel">
+          <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:16px;">Top Countries</h3>
+          <div id="chartCountries" class="chart-bar-wrap"></div>
+          <div id="chartCountriesEmpty" class="empty-state" style="display:none;">No data yet.</div>
+        </div>
+        <div class="panel">
+          <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:16px;">Browsers</h3>
+          <div id="chartBrowsers" class="chart-bar-wrap"></div>
+          <div id="chartBrowsersEmpty" class="empty-state" style="display:none;">No data yet.</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('subscribers')">Subscribers</button>
+        <button class="tab-btn" onclick="switchTab('visitors')">Visitor Log</button>
+        <button class="tab-btn" onclick="switchTab('newsletter')">Send Newsletter</button>
+      </div>
+
+      <!-- Subscribers panel -->
+      <div id="panel-subscribers" class="tab-panel active">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Country</th>
+                <th>City</th>
+                <th>ISP</th>
+                <th>Platform</th>
+                <th>Screen</th>
+                <th>Proxy</th>
+                <th>Subscribed</th>
+              </tr>
+            </thead>
+            <tbody id="subsBody"></tbody>
+          </table>
+        </div>
+        <div id="subsEmpty" class="empty-state" style="display:none;">No subscribers yet.</div>
+      </div>
+
+      <!-- Visitors panel -->
+      <div id="panel-visitors" class="tab-panel">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>IP</th>
+                <th>Country</th>
+                <th>City</th>
+                <th>ISP</th>
+                <th>Page</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody id="visBody"></tbody>
+          </table>
+        </div>
+        <div id="visEmpty" class="empty-state" style="display:none;">No visitors yet.</div>
+        <div class="pagination" id="visPagination" style="display:none;">
+          <button id="visPrev" onclick="loadVisitors(visitorPage - 1)">&larr; Prev</button>
+          <span class="page-info" id="visPageInfo"></span>
+          <button id="visNext" onclick="loadVisitors(visitorPage + 1)">Next &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Newsletter panel -->
+      <div id="panel-newsletter" class="tab-panel">
+        <div class="panel" style="margin-bottom:20px;">
+          <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Compose Newsletter</h3>
+          <p style="color:var(--muted); font-size:13px; margin-bottom:12px;">
+            Write a custom intro message. Upcoming events are auto-populated from the calendar. Preview before sending.
+          </p>
+          <textarea id="nlMessage" placeholder="Optional custom message to include at the top of the newsletter..."></textarea>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="previewNewsletter()">Preview</button>
+            <button class="btn btn-danger" onclick="confirmSendNewsletter()">Send to All Subscribers</button>
+          </div>
+          <div id="sendConfirm" style="display:none;margin-top:12px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:#fff;font-size:13px;font-weight:700;align-items:center;gap:12px;">
+            <span>Send newsletter to ALL subscribers?</span>
+            <button class="btn btn-danger btn-sm" onclick="sendNewsletter()" style="margin-left:auto;">Yes, Send</button>
+            <button class="btn btn-sm" onclick="cancelSendNewsletter()" style="background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.2);">Cancel</button>
+          </div>
+          <div id="nlSendStatus" style="margin-top:12px; font-size:13px; min-height:20px;"></div>
+        </div>
+        <div id="nlPreview" style="display:none;">
+          <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Preview</h3>
+          <div id="nlPreviewContent"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer style="padding:32px 7vw; text-align:center; color:#555; font-size:12px;">
+    Lost Limb Riders Admin Panel · <a href="index.html" style="color:var(--orange);">Back to Site</a>
+  </footer>
+
+  <script>
+    const ADMIN_KEY_STORAGE = 'llr-admin-key';
+    let adminKey = sessionStorage.getItem(ADMIN_KEY_STORAGE) || '';
+    let visitorPage = 1;
+
+    // --- Login ---
+    function attemptLogin() {
+      const key = document.getElementById('loginKey').value.trim();
+      if (!key) return;
+      adminKey = key;
+      sessionStorage.setItem(ADMIN_KEY_STORAGE, key);
+      verifyKey();
+    }
+
+    document.getElementById('loginKey').addEventListener('keydown', e => {
+      if (e.key === 'Enter') attemptLogin();
+    });
+
+    async function verifyKey() {
+      try {
+        const res = await fetch('api/admin.php?action=stats&key=' + encodeURIComponent(adminKey));
+        if (res.ok) {
+          document.getElementById('loginOverlay').classList.add('hidden');
+          loadAll();
+        } else {
+          document.getElementById('loginError').textContent = 'Invalid key.';
+          sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+          adminKey = '';
+        }
+      } catch {
+        document.getElementById('loginError').textContent = 'Connection error.';
+      }
+    }
+
+    function apiUrl(action, extra) {
+      let url = 'api/admin.php?action=' + action + '&key=' + encodeURIComponent(adminKey);
+      if (extra) url += '&' + extra;
+      return url;
+    }
+
+    // --- Tabs ---
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+
+      if (name === 'subscribers') loadSubscribers();
+      if (name === 'visitors') loadVisitors(1);
+    }
+
+    // --- Charts ---
+    function renderBarChart(containerId, emptyId, data, maxVal) {
+      const container = document.getElementById(containerId);
+      const empty = document.getElementById(emptyId);
+      const entries = Object.entries(data);
+      if (!entries.length) { container.style.display = 'none'; empty.style.display = 'block'; return; }
+      container.style.display = 'flex'; empty.style.display = 'none';
+      const max = maxVal || Math.max(...entries.map(e => e[1]), 1);
+      container.innerHTML = entries.map(([label, count]) => {
+        const pct = Math.max(8, (count / max) * 100);
+        return '<div class="chart-bar-col">' +
+          '<div class="chart-bar-num">' + count + '</div>' +
+          '<div class="chart-bar" style="height:' + pct + '%;"></div>' +
+          '<div class="chart-bar-label">' + escapeHtml(label.length > 12 ? label.slice(0,10) + '…' : label) + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // --- Stats ---
+    async function loadStats() {
+      try {
+        const res = await fetch(apiUrl('stats'));
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('statVisits').textContent = data.totalVisits || 0;
+        document.getElementById('statToday').textContent = data.todayVisits || 0;
+        document.getElementById('statSubs').textContent = data.subscribers || 0;
+        renderBarChart('chartCountries', 'chartCountriesEmpty', data.topCountries || {});
+        renderBarChart('chartBrowsers', 'chartBrowsersEmpty', data.browserStats || {});
+      } catch {}
+    }
+
+    // --- Subscribers ---
+    async function loadSubscribers() {
+      try {
+        const res = await fetch(apiUrl('subscribers'));
+        if (!res.ok) return;
+        const data = await res.json();
+        const subs = data.subscribers || [];
+        const body = document.getElementById('subsBody');
+        const empty = document.getElementById('subsEmpty');
+        if (!subs.length) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        body.innerHTML = subs.map(s => {
+          const geo = s.geolocation || {};
+          const net = s.network || {};
+          const br = s.browser || {};
+          const proxy = net.proxy;
+          const hosting = net.hosting;
+          let badges = '';
+          if (proxy) badges += '<span class="badge badge-proxy">Proxy</span> ';
+          if (hosting) badges += '<span class="badge badge-hosting">Hosting</span> ';
+          if (!proxy && !hosting) badges = '<span class="badge badge-clean">Clean</span>';
+          return '<tr>' +
+            '<td>' + escapeHtml(s.name || '') + '</td>' +
+            '<td>' + escapeHtml(s.email || '') + '</td>' +
+            '<td>' + escapeHtml(geo.country || 'N/A') + '</td>' +
+            '<td>' + escapeHtml(geo.city || 'N/A') + '</td>' +
+            '<td title="' + escapeHtml(geo.isp || 'N/A') + '">' + escapeHtml(truncate(geo.isp || 'N/A', 24)) + '</td>' +
+            '<td>' + escapeHtml(br.platform || 'N/A') + '</td>' +
+            '<td>' + escapeHtml(br.screen || 'N/A') + '</td>' +
+            '<td>' + badges + '</td>' +
+            '<td>' + escapeHtml(formatDate(s.signedAt)) + '</td>' +
+          '</tr>';
+        }).join('');
+      } catch {}
+    }
+
+    // --- Visitors ---
+    async function loadVisitors(page) {
+      visitorPage = page || 1;
+      try {
+        const res = await fetch(apiUrl('visitors', 'page=' + visitorPage + '&limit=25'));
+        if (!res.ok) return;
+        const data = await res.json();
+        const visitors = data.visitors || [];
+        const body = document.getElementById('visBody');
+        const empty = document.getElementById('visEmpty');
+        const pag = document.getElementById('visPagination');
+        if (!visitors.length) { body.innerHTML = ''; empty.style.display = 'block'; pag.style.display = 'none'; return; }
+        empty.style.display = 'none';
+        pag.style.display = 'flex';
+        body.innerHTML = visitors.map(v => {
+          return '<tr>' +
+            '<td style="white-space:nowrap;">' + escapeHtml(v.timestamp || '') + '</td>' +
+            '<td style="font-family:monospace;font-size:12px;">' + escapeHtml(v.ip || '') + '</td>' +
+            '<td>' + escapeHtml(v.country || 'N/A') + '</td>' +
+            '<td>' + escapeHtml(v.city || 'N/A') + '</td>' +
+            '<td>' + escapeHtml(truncate(v.isp || 'N/A', 20)) + '</td>' +
+            '<td>' + escapeHtml(truncate(v.page || 'N/A', 30)) + '</td>' +
+            '<td title="' + escapeHtml(v.userAgent || '') + '">' + escapeHtml(truncate(v.userAgent || '', 40)) + '</td>' +
+          '</tr>';
+        }).join('');
+        document.getElementById('visPageInfo').textContent = 'Page ' + data.page + ' of ' + data.pages + ' (' + data.total + ' total)';
+        document.getElementById('visPrev').disabled = data.page <= 1;
+        document.getElementById('visNext').disabled = data.page >= data.pages;
+      } catch {}
+    }
+
+    // --- Newsletter ---
+    async function previewNewsletter() {
+      const msg = document.getElementById('nlMessage').value.trim();
+      const previewDiv = document.getElementById('nlPreview');
+      const content = document.getElementById('nlPreviewContent');
+      try {
+        const res = await fetch(apiUrl('send-newsletter'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg })
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        content.innerHTML = '<iframe id="nlFrame" sandbox="allow-same-origin"></iframe>';
+        previewDiv.style.display = 'block';
+        const frame = document.getElementById('nlFrame');
+        frame.srcdoc = data.html;
+      } catch {}
+    }
+
+    let pendingSend = false;
+
+    function confirmSendNewsletter() {
+      const status = document.getElementById('nlSendStatus');
+      document.getElementById('sendConfirm').style.display = 'flex';
+      document.getElementById('sendCancelBtn').focus();
+    }
+
+    function cancelSendNewsletter() {
+      document.getElementById('sendConfirm').style.display = 'none';
+    }
+
+    async function sendNewsletter() {
+      const msg = document.getElementById('nlMessage').value.trim();
+      const status = document.getElementById('nlSendStatus');
+      document.getElementById('sendConfirm').style.display = 'none';
+      status.textContent = 'Building newsletter...';
+      try {
+        const res = await fetch(apiUrl('send-newsletter'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg })
+        });
+        if (!res.ok) { status.textContent = 'Failed to build newsletter.'; return; }
+        const data = await res.json();
+        status.textContent = 'Newsletter built with ' + data.eventCount + ' events. HTML generated. To actually send via cron, run: php api/cron-newsletter.php';
+      } catch {
+        status.textContent = 'Connection error.';
+      }
+    }
+
+    // --- Utilities ---
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function truncate(str, len) {
+      return str.length > len ? str.slice(0, len - 1) + '…' : str;
+    }
+
+    function formatDate(iso) {
+      if (!iso || iso === 'unknown') return 'N/A';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch { return iso; }
+    }
+
+    // --- Init ---
+    if (adminKey) {
+      verifyKey();
+    }
+  </script>
+
+</body>
+</html>
