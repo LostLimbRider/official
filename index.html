@@ -546,12 +546,13 @@
     <section id="newsletter">
       <div class="wrap panel" style="text-align:center;">
         <h2 class="section-title">Join the <span class="orange">Ride</span></h2>
-        <p class="lead" style="max-width:600px; margin:0 auto 28px;">Get updates on events, rides, podcasts, and the mission. No spam. Just the good stuff — straight to your inbox.</p>
+        <p class="lead" style="max-width:600px; margin:0 auto 8px;">Get updates on events, rides, podcasts, and the mission. No spam. Just the good stuff — straight to your inbox.</p>
+        <p style="max-width:600px; margin:0 auto 28px; color:var(--orange); font-weight:800; font-size:15px;">Subscribe now and get a FREE digital copy of <em>I Can. I Will.</em> — John's full autobiography.</p>
         <form id="newsletterForm" style="max-width:560px; margin:0 auto;">
           <div class="newsletter-row">
             <input id="nlName" autocomplete="name" placeholder="Full name" required>
             <input id="nlEmail" type="email" autocomplete="email" placeholder="Email address" required>
-            <button type="submit" style="white-space:nowrap;">Subscribe</button>
+            <button type="submit" style="white-space:nowrap;">Get the Book</button>
           </div>
           <div id="nlStatus" class="newsletter-status" role="status" aria-live="polite"></div>
         </form>
@@ -675,8 +676,12 @@
           body: JSON.stringify({ name, email, ...deviceData })
         });
         const data = await res.json();
-        nlStatus.textContent = data.message || (data.ok ? 'Subscribed!' : 'Something went wrong.');
-        if (data.ok) nlForm.reset();
+        if (data.ok) {
+          nlStatus.innerHTML = 'Welcome to the ride. Here is your free copy of <strong>I Can. I Will.</strong>: <a href="assets/202607061311-i-can-i-will.zip" download style="color:var(--orange);text-decoration:underline;font-weight:800;">Download Book (ZIP)</a>';
+          nlForm.reset();
+        } else {
+          nlStatus.textContent = data.message || 'Something went wrong.';
+        }
       } catch (err) {
         nlStatus.textContent = 'Network error. Please try again.';
       }
