@@ -1,1 +1,8 @@
 ADMIN_MANUAL.md
+data/guestbook.json
+data/newsletter.json
+data/visitors.log
+node_modules/
+.vercel/
+.env
+.env*.local

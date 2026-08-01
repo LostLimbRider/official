@@ -578,7 +578,7 @@
 
     async function verifyKey() {
       try {
-        const res = await fetch('api/admin.php?action=stats&key=' + encodeURIComponent(adminKey));
+        const res = await fetch('/api/admin?action=stats&key=' + encodeURIComponent(adminKey));
         if (res.ok) {
           document.getElementById('loginOverlay').classList.add('hidden');
           loadAll();
@@ -593,7 +593,7 @@
     }
 
     function apiUrl(action, extra) {
-      let url = 'api/admin.php?action=' + action + '&key=' + encodeURIComponent(adminKey);
+      let url = '/api/admin?action=' + action + '&key=' + encodeURIComponent(adminKey);
       if (extra) url += '&' + extra;
       return url;
     }
@@ -753,7 +753,7 @@
         });
         if (!res.ok) { status.textContent = 'Failed to build newsletter.'; return; }
         const data = await res.json();
-        status.textContent = 'Newsletter built with ' + data.eventCount + ' events. HTML generated. To actually send via cron, run: php api/cron-newsletter.php';
+        status.textContent = 'Newsletter built with ' + data.eventCount + ' events. HTML generated. Scheduled sends run automatically via the Vercel cron (weekly, sends every two weeks).';
       } catch {
         status.textContent = 'Connection error.';
       }

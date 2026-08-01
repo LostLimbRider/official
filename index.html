@@ -576,7 +576,7 @@
   </footer>
 
   <script>
-    const storageKey = 'lost-limb-riders-guestbook';
+    const guestbookApi = '/api/guestbook';
     const form = document.getElementById('guestbookForm');
     const list = document.getElementById('guestbookList');
     const status = document.getElementById('guestStatus');
@@ -590,17 +590,31 @@
       }
     ];
 
-    function getEntries() {
+    function formatGuestbookDate(iso) {
+      if (!iso) return '';
       try {
-        const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        return Array.isArray(saved) && saved.length ? saved : fallbackEntries;
+        return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
       } catch (error) {
-        return fallbackEntries;
+        return '';
       }
     }
 
-    function saveEntries(entries) {
-      localStorage.setItem(storageKey, JSON.stringify(entries.filter(entry => entry.date !== 'Pinned message')));
+    async function loadEntries() {
+      try {
+        const res = await fetch(guestbookApi + '?action=list');
+        if (!res.ok) throw new Error('bad response');
+        const data = await res.json();
+        const entries = Array.isArray(data.entries) ? data.entries : [];
+        if (!entries.length) { renderEntries(fallbackEntries); return; }
+        renderEntries(entries.map(entry => ({
+          name: entry.name,
+          location: entry.location,
+          message: entry.message,
+          date: formatGuestbookDate(entry.savedAt)
+        })));
+      } catch (error) {
+        renderEntries(fallbackEntries);
+      }
     }
 
     function escapeHtml(value) {
@@ -613,8 +627,8 @@
       }[character]));
     }
 
-    function renderEntries() {
-      list.innerHTML = getEntries().map(entry => `
+    function renderEntries(entries) {
+      list.innerHTML = entries.map(entry => `
         <article class="guest-entry">
           <strong>${escapeHtml(entry.name)}</strong>
           <small>${escapeHtml([entry.location, entry.date].filter(Boolean).join(' • '))}</small>
@@ -623,7 +637,7 @@
       `).join('');
     }
 
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
 
       const name = document.getElementById('guestName').value.trim();
@@ -635,21 +649,27 @@
         return;
       }
 
-      const entries = getEntries().filter(entry => entry.date !== 'Pinned message');
-      entries.unshift({
-        name,
-        location,
-        message,
-        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
-      });
-
-      saveEntries(entries.slice(0, 25));
-      form.reset();
-      status.textContent = 'Your message was added to the guest book.';
-      renderEntries();
+      status.textContent = 'Posting your message...';
+      try {
+        const res = await fetch(guestbookApi + '?action=add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, location, message })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          form.reset();
+          status.textContent = 'Your message was added to the guest book.';
+          await loadEntries();
+        } else {
+          status.textContent = data.error || 'Something went wrong.';
+        }
+      } catch (error) {
+        status.textContent = 'Network error. Please try again.';
+      }
     });
 
-    renderEntries();
+    loadEntries();
 
     const nlForm = document.getElementById('newsletterForm');
     const nlStatus = document.getElementById('nlStatus');
@@ -670,7 +690,7 @@
           dnt:       navigator.doNotTrack || window.doNotTrack || '',
           page:      window.location.href
         };
-        const res = await fetch('api/newsletter.php', {
+        const res = await fetch('/api/newsletter', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, ...deviceData })
@@ -697,7 +717,7 @@
         dnt: navigator.doNotTrack || 'unknown',
         page: location.href
       };
-      fetch('api/visit.php', {
+      fetch('/api/visit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
