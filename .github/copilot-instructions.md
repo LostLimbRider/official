@@ -174,3 +174,96 @@ If `data/*.json` files become corrupted or locked:
 2. Look for unclosed file handles from hung PHP processes.
 3. Restore from backup or manually repair by running the corresponding API endpoint to rewrite the file.
 4. Verify `flock()` and `fclose()` are always called (even on error paths).
+
+## Security Considerations
+
+### Admin Key Management
+- **Never** commit the actual admin key to the repository.
+- Store only in environment variable `GUESTBOOK_ADMIN_KEY` on the server.
+- Use timing-safe comparison: `hash_equals($adminKey, $_GET['key'] ?? '')` when validating.
+- Rotate the key periodically; update all clients accordingly.
+- Generate with: `openssl rand -base64 32`
+
+### API Security
+- Admin APIs only accept GET with query `?key=<value>` — no authentication headers or POST body keys.
+- POST/PUT/DELETE operations for data (events, guestbook, newsletter) **always** require admin key.
+- **GET** (read-only public data) never requires authentication.
+- Validate and sanitize all input: `trim()`, `filter_var($email, FILTER_VALIDATE_EMAIL)`, `htmlspecialchars()` for display.
+- Always return JSON errors with appropriate HTTP status codes (400, 403, 422, 500).
+
+### Data Privacy
+- Newsletter signup silently collects full visitor profiles (IP, geolocation, device, browser).
+- **No explicit user consent is gathered** — feature operates passively.
+- Subscriber data in `data/newsletter.json` is sensitive (full marketing profile) — restrict server access.
+- Visitor logs in `data/visitors.log` are append-only raw entries — retention policy not defined in code.
+
+## API Response Patterns
+
+All endpoints use consistent JSON response format:
+
+**Success (read):**
+```json
+{ "events": [...] }
+```
+
+**Success (create):**
+```json
+{ "id": "ev-123", "title": "Event Name", ... }
+```
+
+**Error:**
+```json
+{ "error": "Admin access required.", "status": 403 }
+```
+
+**HTTP Status Codes:**
+- `200` — Successful GET or update
+- `201` — Successful create
+- `204` — Successful delete (often no body)
+- `400` — Bad request (validation error)
+- `403` — Forbidden (missing/invalid admin key)
+- `422` — Unprocessable entity (missing required fields)
+- `500` — Server error (file I/O, mail failure, external API failure)
+
+## Performance & Limits
+
+- **events.json** — No strict size limit; performance degrades beyond ~1,000 events
+- **newsletter.json** — Max 5,000 subscribers (self-enforced in code)
+- **guestbook.json** — Max 500 entries (self-enforced in code)
+- **visitors.log** — Append-only, grows indefinitely; consider archival/rotation for long-running deployments
+- **IP geolocation via ip-api.com** — Free tier rate-limited to ~45 req/min; production should upgrade or cache
+
+## Testing Checklist
+
+When deploying changes:
+
+1. **Admin authentication** — Verify admin key prompt appears on calendar, events form is hidden without key
+2. **Event CRUD** — Add, edit, delete event with admin key; verify public sees only published events
+3. **Newsletter signup** — Submit form, verify name+email captured in `data/newsletter.json`
+4. **Visitor logging** — Load any page, check `data/visitors.log` for new entry
+5. **Newsletter template** — Edit template, verify placeholders render correctly in preview
+6. **File permissions** — Ensure `data/` directory and files are readable/writable by PHP process
+7. **Geolocation** — Verify ip-api.com returns data (may fail on localhost without real IP)
+
+## Troubleshooting
+
+**"Admin access required" even with correct key:**
+- Check `GUESTBOOK_ADMIN_KEY` env var is set on server (not in code).
+- Verify key matches exactly (no extra spaces, encoding issues).
+- Clear browser `sessionStorage` and re-enter key: `sessionStorage.removeItem('llr-admin-key')`
+
+**Events not persisting:**
+- Verify `data/events.json` exists and is readable: `ls -la data/events.json`
+- Check directory permissions: `chmod 755 data && chmod 644 data/*.json`
+- Look for PHP errors in web server logs (usually `/var/log/apache2/error.log` or `/var/log/nginx/error.log`)
+
+**Newsletter signup failing:**
+- Verify ip-api.com is reachable (may fail behind proxy/firewall)
+- Check `curl` extension is installed: `php -m | grep curl`
+- Review `data/newsletter.json` size (max 5,000 subscribers)
+
+**Cron newsletter not sending:**
+- Verify PHP can execute (not in web-only mode)
+- Check PHP `mail()` is configured on server (requires postfix/sendmail)
+- Test with: `php api/cron-newsletter.php` from command line
+- Review crontab entry (should run as web user, e.g., `www-data`)
