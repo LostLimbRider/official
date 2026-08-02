@@ -105,7 +105,7 @@ Changes are validated by manual testing in `vercel dev`.
 - **GUESTBOOK_ADMIN_KEY** — Secret key for admin API operations. Generate: `openssl rand -base64 32`
 - **CRON_SECRET** — Secret sent by Vercel Cron as `Authorization: Bearer`; the cron endpoint refuses requests without it. Generate: `openssl rand -base64 32`
 - **RESEND_API_KEY** — Resend API key (email sending, free tier 100 emails/day)
-- **RESEND_FROM** — Sender address, e.g. `Lost Limb Riders <noreply@yourdomain>`
+- **RESEND_FROM** — Sender address, e.g. `Lost Limb Riders <john.thompson@lostlimbriders.org>`
 - **NEWSLETTER_MESSAGE** — Optional default intro message for the cron newsletter
 
 ## Deployment Notes

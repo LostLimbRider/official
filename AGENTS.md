@@ -53,7 +53,7 @@ Keys stored as JSON arrays under `llr:*`:
 - `GUESTBOOK_ADMIN_KEY` — secret key for admin API operations (`openssl rand -base64 32`).
 - `CRON_SECRET` — secret sent by Vercel Cron as `Authorization: Bearer`; the cron endpoint refuses requests without it.
 - `RESEND_API_KEY` — Resend API key (email sending, free tier 100/day).
-- `RESEND_FROM` — sender address, e.g. `Lost Limb Riders <noreply@yourdomain>`.
+- `RESEND_FROM` — sender address, e.g. `Lost Limb Riders <john.thompson@lostlimbriders.org>`.
 - `NEWSLETTER_MESSAGE` — optional default intro message for the cron newsletter.
 
 ## Deployment
