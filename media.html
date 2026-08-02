@@ -656,6 +656,133 @@
       border-top: 1px solid var(--line);
     }
 
+    /* ADMIN */
+    body.admin-mode .admin-only { display: inline-flex !important; }
+    body.admin-mode .admin-only-flex { display: flex !important; }
+    .admin-only, .admin-only-flex { display: none !important; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 300;
+      padding: 12px 22px;
+      border-radius: 12px;
+      background: rgba(17,17,17,.95);
+      border: 1px solid rgba(255,106,0,.4);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .overlay.open { display: flex; }
+
+    .admin-key-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
+    }
+    .admin-key-card h3 { margin: 0 0 6px; font-size: 20px; text-transform: uppercase; letter-spacing: -.02em; }
+    .admin-key-card p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+    .admin-key-card input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,.05);
+      color: var(--white);
+      font-size: 15px;
+      outline: none;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    .admin-key-card input:focus { border-color: var(--orange); }
+    .admin-key-card .error { color: #ef4444; font-size: 13px; margin-bottom: 12px; min-height: 16px; }
+    .admin-key-card .actions { display: flex; gap: 10px; }
+    .admin-key-card .actions .btn { flex: 1; justify-content: center; }
+
+    .media-modal {
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
+      box-shadow: 0 40px 100px rgba(0,0,0,.6);
+      position: relative;
+    }
+    .media-modal h3 { margin: 0 0 20px; font-size: 22px; text-transform: uppercase; letter-spacing: -.02em; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-field label { display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,.05);
+      color: var(--white);
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--orange); }
+    .form-field textarea { resize: vertical; min-height: 90px; }
+    .form-field select option { background: #111; }
+    .checkbox-field { display: flex; align-items: center; gap: 10px; }
+    .checkbox-field input { width: 18px; height: 18px; }
+    .checkbox-field label { margin: 0; font-size: 14px; font-weight: 800; color: var(--white); text-transform: none; letter-spacing: 0; }
+    .form-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .form-actions .btn { justify-content: center; }
+    .delete-btn {
+      padding: 8px 14px;
+      border: 1px solid rgba(239,68,68,.5);
+      border-radius: 10px;
+      background: rgba(239,68,68,.12);
+      color: #f87171;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .delete-btn:hover { background: rgba(239,68,68,.25); }
+    .delete-confirm-bar {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border: 1px solid rgba(239,68,68,.5);
+      border-radius: 10px;
+      background: rgba(239,68,68,.1);
+      color: #fca5a5;
+      font-size: 13px;
+    }
+    .delete-confirm-bar.show { display: flex; }
+
     @media (max-width: 940px) {
       .nav { position: static; align-items: flex-start; flex-direction: column; }
       .nav-links { flex-wrap: wrap; }
@@ -704,6 +831,7 @@
       <a class="btn btn-primary" href="#podcasts">Listen to the Podcast</a>
       <a class="btn btn-secondary" href="#vlogs">Watch the Vlogs</a>
       <a class="btn btn-ghost" href="#coffeetalk">Coffee Talk</a>
+      <button class="btn btn-primary admin-only" onclick="openCreateEpisode()" style="justify-content:center;">+ New Episode</button>
     </div>
   </header>
 
@@ -727,6 +855,7 @@
             <div class="meta" id="featuredMeta">Episode 1 &bull; Season 1 &bull; 42 min</div>
             <p class="desc" id="featuredDesc">John Thompson sits down and tells the full story — from the day he lost his leg to the moment he decided no amputee should ever ride alone. This is the episode that started it all.</p>
             <div class="audio-player" id="audioPlayer">
+              <audio id="audioEl" preload="metadata" style="display:none;"></audio>
               <button class="play-btn" id="playBtn" onclick="togglePlay()">&#9654;</button>
               <div class="player-track">
                 <div class="progress-bar" onclick="seek(event)">
@@ -851,135 +980,109 @@
     </div>
   </div>
 
+  <!-- ADMIN KEY OVERLAY -->
+  <div class="overlay" id="adminKeyOverlay">
+    <div class="admin-key-card">
+      <h3>Admin Access</h3>
+      <p>Enter the admin key to manage episodes.</p>
+      <input id="adminKeyInput" type="password" placeholder="Admin key" autocomplete="off">
+      <div class="error" id="adminKeyError"></div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="closeAdminKey()" style="justify-content:center;">Cancel</button>
+        <button class="btn btn-primary" onclick="submitAdminKey()" style="justify-content:center;">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EPISODE MODAL -->
+  <div class="overlay" id="episodeModal">
+    <div class="media-modal">
+      <h3 id="episodeModalTitle">New Episode</h3>
+      <form id="episodeForm" onsubmit="saveEpisode(event)">
+        <input type="hidden" id="editId" value="">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Type</label>
+            <select id="mdType">
+              <option value="podcast">Podcast</option>
+              <option value="vlog">Vlog</option>
+              <option value="coffeetalk">Coffee Talk</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Title *</label>
+            <input id="mdTitle" maxlength="300" placeholder="Episode title">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Date</label>
+            <input id="mdDate" maxlength="30" placeholder="e.g. Aug 2026">
+          </div>
+          <div class="form-field">
+            <label>Duration</label>
+            <input id="mdDuration" maxlength="12" placeholder="e.g. 42:18">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Episode Number</label>
+            <input id="mdNum" maxlength="10" placeholder="e.g. 01">
+          </div>
+          <div class="form-field">
+            <label>Season</label>
+            <input id="mdSeason" maxlength="10" placeholder="e.g. 1">
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Audio URL (podcast / audio-only)</label>
+          <input id="mdAudioUrl" maxlength="1000" placeholder="https://.../episode.mp3">
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>YouTube Video ID (vlogs / video episodes)</label>
+          <input id="mdVideoId" maxlength="200" placeholder="e.g. dQw4w9WgXcQ">
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Description</label>
+          <textarea id="mdDesc" maxlength="4000" placeholder="Episode description"></textarea>
+        </div>
+        <div class="checkbox-field" style="margin-bottom:20px;">
+          <input type="checkbox" id="mdFeatured">
+          <label for="mdFeatured">Featured (show in "Now Playing")</label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeEpisodeModal()">Cancel</button>
+          <button type="button" class="delete-btn" id="deleteEpisodeBtn" onclick="confirmDeleteEpisode()" style="display:none;">Delete</button>
+          <button type="submit" class="btn btn-primary" id="episodeSubmitBtn">Create Episode</button>
+        </div>
+        <div class="delete-confirm-bar" id="deleteConfirm">
+          <span>Delete this episode? This cannot be undone.</span>
+          <button type="button" class="delete-btn" onclick="executeDeleteEpisode()">Yes, Delete</button>
+          <button type="button" class="delete-btn" onclick="cancelDeleteEpisode()" style="border-color:rgba(255,255,255,.2);color:var(--muted);background:transparent;">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
   <script>
-    const PODCASTS = [
-      {
-        id: 'p1', num: '01', season: 1, title: 'I Can. I Will. — The Story Behind the Mission',
-        date: 'Jul 2026', duration: '42:18', durationSec: 2538,
-        desc: 'John Thompson sits down and tells the full story — from the day he lost his leg to the moment he decided no amputee should ever ride alone. This is the episode that started it all.',
-        featured: true
-      },
-      {
-        id: 'p2', num: '02', season: 1, title: 'Phantom Pain Is Real — And Nobody Talks About It',
-        date: 'Jul 2026', duration: '38:45', durationSec: 2325,
-        desc: 'John digs into phantom limb pain — what it actually feels like, how doctors treat it, and the mental toll it takes on amputees who suffer in silence.'
-      },
-      {
-        id: 'p3', num: '03', season: 1, title: 'First Ride After Amputation',
-        date: 'Aug 2026', duration: '35:12', durationSec: 2112,
-        desc: 'What does it feel like to throw a leg over a motorcycle for the first time after losing a limb? Three amputee riders share the raw, unfiltered truth.'
-      },
-      {
-        id: 'p4', num: '04', season: 1, title: 'The Caregivers — What They Never Tell You',
-        date: 'Aug 2026', duration: '44:03', durationSec: 2643,
-        desc: 'Spouses, parents, and friends of amputees share what it is really like on the other side — the fear, the patience, the pride, and the exhaustion.'
-      },
-      {
-        id: 'p5', num: '05', season: 1, title: 'Prosthetics 101 — Legs, Bikes, and Breaking Rules',
-        date: 'Sep 2026', duration: '40:27', durationSec: 2427,
-        desc: 'A prosthetist and two amputee riders break down everything you need to know about prosthetic legs, riding with one, and the gear that makes it possible.'
-      },
-      {
-        id: 'p6', num: '06', season: 1, title: 'Faith, Family, and Forward Motion',
-        date: 'Sep 2026', duration: '37:55', durationSec: 2275,
-        desc: 'John talks about the role faith and family played in his recovery — and why he believes the road to healing runs through community, not isolation.'
-      },
-      {
-        id: 'p7', num: '07', season: 2, title: 'Veterans Who Ride — Service, Sacrifice, and the Open Road',
-        date: 'Oct 2026', duration: '46:10', durationSec: 2770,
-        desc: 'Three military veterans who lost limbs in service share how riding motorcycles helped them reclaim their identity and their freedom.'
-      },
-      {
-        id: 'p8', num: '08', season: 2, title: 'Kids Who Don\'t Quit — Young Amputees Taking On the World',
-        date: 'Oct 2026', duration: '39:48', durationSec: 2388,
-        desc: 'Two young amputees and their parents talk about growing up different, finding confidence, and the programs that changed their lives.'
-      }
-    ];
-
-    const VLOGS = [
-      {
-        id: 'v1', title: 'Building the Lost Limb Riders — From Idea to Mission',
-        date: 'Jul 2026', duration: '18:34', videoId: 'dQw4w9WgXcQ',
-        desc: 'John walks through the first steps of founding Lost Limb Riders — the vision, the logo, the website, and why this mission matters more than anything he has ever done.'
-      },
-      {
-        id: 'v2', title: 'First Group Ride — Fort Dodge to Webster County',
-        date: 'Aug 2026', duration: '24:12', videoId: 'dQw4w9WgXcQ',
-        desc: 'The cameras ride along for the first official Lost Limb Riders group ride. Scenery, sound, and stories from the road.'
-      },
-      {
-        id: 'v3', title: 'Prosthetic Leg Meets Motorcycle — The Full Breakdown',
-        date: 'Aug 2026', duration: '21:45', videoId: 'dQw4w9WgXcQ',
-        desc: 'John shows exactly how he rides with a prosthetic leg — the adjustments, the technique, and the gear that makes it work.'
-      },
-      {
-        id: 'v4', title: 'Event Day Recap — Community Cookout & Fundraiser',
-        date: 'Sep 2026', duration: '16:08', videoId: 'dQw4w9WgXcQ',
-        desc: 'Highlights from the first LLR community cookout — food, music, testimonials, and the people who showed up to make it happen.'
-      },
-      {
-        id: 'v5', title: 'A Day in the Life — Amputee Rider Edition',
-        date: 'Sep 2026', duration: '19:55', videoId: 'dQw4w9WgXcQ',
-        desc: 'Follow John through a typical day — morning routine with a prosthetic, getting ready to ride, and the small victories that nobody talks about.'
-      },
-      {
-        id: 'v6', title: 'Fall Rally Highlights — Poker Run, Music, and Community',
-        date: 'Oct 2026', duration: '22:30', videoId: 'dQw4w9WgXcQ',
-        desc: 'The biggest LLR event yet. Riders, families, food trucks, live testimonials, and a poker run that brought the whole community together.'
-      }
-    ];
-
-    const COFFEETALK = [
-      {
-        id: 'ct1', num: '01', title: 'So You Just Lost a Limb — Now What?',
-        date: 'Jul 2026', duration: '34:12', durationSec: 2052,
-        videoId: 'dQw4w9WgXcQ',
-        desc: 'John and a guest sit down with coffee and walk through the first 90 days after amputation — the stuff doctors do not tell you, the emotional rollercoaster, and the small wins that keep you going.',
-        hasVideo: true
-      },
-      {
-        id: 'ct2', num: '02', title: 'Phantom Pain, Real Frustration',
-        date: 'Aug 2026', duration: '28:45', durationSec: 1725,
-        videoId: 'dQw4w9WgXcQ',
-        desc: 'A casual but honest conversation about phantom limb pain — what works, what does not, and why nobody warned us about it.',
-        hasVideo: true
-      },
-      {
-        id: 'ct3', num: '03', title: 'Riding With a Prosthetic — The Questions Everyone Asks',
-        date: 'Aug 2026', duration: '31:08', durationSec: 1868,
-        videoId: 'dQw4w9WgXcQ',
-        desc: 'John answers the most common questions he gets about riding a motorcycle with a prosthetic leg. Some serious, some funny, all real.',
-        hasVideo: true
-      },
-      {
-        id: 'ct4', num: '04', title: 'Coffee with the Caregivers',
-        date: 'Sep 2026', duration: '36:30', durationSec: 2190,
-        videoId: 'dQw4w9WgXcQ',
-        desc: 'Spouses, parents, and friends of amputees pull up a chair and talk about what it is really like to care for someone through limb loss.',
-        hasVideo: true
-      },
-      {
-        id: 'ct5', num: '05', title: 'Faith on the Hard Days',
-        date: 'Sep 2026', duration: '29:55', durationSec: 1795,
-        videoId: 'dQw4w9WgXcQ',
-        desc: 'An honest, unscripted conversation about faith, doubt, and how spiritual life changes when your body does.',
-        hasVideo: true
-      },
-      {
-        id: 'ct6', num: '06', title: 'What Nobody Tells You About Prosthetics',
-        date: 'Oct 2026', duration: '33:40', durationSec: 2020,
-        videoId: 'dQw4w9WgXcQ',
-        desc: 'John and a prosthetist break down the real costs, the insurance headaches, and the hacks that actually help amputees get the gear they need.',
-        hasVideo: true
-      }
-    ];
-
+    const API_BASE = '/api/media';
+    let media = [];
+    let adminMode = false;
+    let adminKey = sessionStorage.getItem('llr-admin-key') || '';
     let playing = false;
     let currentEpisode = null;
     let playProgress = 0;
     let playInterval = null;
     let playbackSpeed = 1;
+    let pendingDeleteId = null;
     const speeds = [1, 1.25, 1.5, 2, 0.75];
+
+    const byType = (t) => media.filter(m => m.type === t);
+    const PODCASTS = () => byType('podcast');
+    const VLOGS = () => byType('vlog');
+    const COFFEETALK = () => byType('coffeetalk');
 
     function escapeHtml(s) {
       return s.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
@@ -991,47 +1094,101 @@
       return `${m}:${String(s).padStart(2,'0')}`;
     }
 
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    async function fetchMedia() {
+      try {
+        const res = await fetch(API_BASE + '?action=list');
+        const data = await res.json();
+        media = Array.isArray(data.media) ? data.media : [];
+      } catch (e) {
+        media = [];
+      }
+      loadFeatured();
+      renderPodcasts();
+      renderVlogs();
+      renderCoffeeTalk();
+    }
+
     function loadFeatured() {
-      const ep = PODCASTS.find(p => p.featured) || PODCASTS[0];
+      const list = PODCASTS();
+      const ep = list.find(p => p.featured) || list[0];
+      if (!ep) return;
       currentEpisode = ep;
+      stopAudio();
+      document.getElementById('featuredBadge').className = 'featured-badge podcast';
+      document.getElementById('featuredBadge').textContent = 'Podcast';
       document.getElementById('featuredTitle').textContent = ep.title;
       document.getElementById('featuredMeta').textContent = `Episode ${ep.num} \u2022 Season ${ep.season} \u2022 ${ep.duration}`;
       document.getElementById('featuredDesc').textContent = ep.desc;
       document.getElementById('totalTime').textContent = ep.duration;
+      document.getElementById('currentTime').textContent = '0:00';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('playBtn').innerHTML = '&#9654;';
+    }
+
+    function stopAudio() {
+      const audio = document.getElementById('audioEl');
+      if (!audio) return;
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
     }
 
     function renderPodcasts() {
       const grid = document.getElementById('podcastGrid');
-      grid.innerHTML = PODCASTS.map(ep => `
+      const list = PODCASTS();
+      if (!list.length) {
+        grid.innerHTML = `<p style="color:var(--muted);">No podcast episodes yet.</p>`;
+        return;
+      }
+      grid.innerHTML = list.map(ep => `
         <div class="episode-card" onclick="playEpisode('${ep.id}')">
           <div class="ep-art podcast">
             &#127911;
-            <span class="ep-num">${ep.num}</span>
+            <span class="ep-num">${escapeHtml(ep.num || '')}</span>
           </div>
           <div class="ep-info">
-            <div class="ep-type podcast">Podcast \u2022 S${ep.season}</div>
+            <div class="ep-type podcast">Podcast \u2022 S${escapeHtml(ep.season || '1')}</div>
             <h3>${escapeHtml(ep.title)}</h3>
-            <div class="ep-meta">${ep.date} \u2022 ${ep.duration}</div>
+            <div class="ep-meta">${escapeHtml(ep.date || '')} \u2022 ${escapeHtml(ep.duration || '')}</div>
             <div class="ep-desc">${escapeHtml(ep.desc)}</div>
           </div>
-          <button class="ep-play" onclick="event.stopPropagation(); playEpisode('${ep.id}')" aria-label="Play">&#9654;</button>
+          ${adminMode ? `
+            <div style="display:flex;flex-direction:column;gap:6px;align-self:center;flex-shrink:0;">
+              <button class="ep-play" onclick="event.stopPropagation(); editEpisode('${ep.id}')" aria-label="Edit" title="Edit">&hellip;</button>
+            </div>
+          ` : `
+            <button class="ep-play" onclick="event.stopPropagation(); playEpisode('${ep.id}')" aria-label="Play">&#9654;</button>
+          `}
         </div>
       `).join('');
     }
 
     function renderVlogs() {
       const grid = document.getElementById('videoGrid');
-      grid.innerHTML = VLOGS.map(v => `
+      const list = VLOGS();
+      if (!list.length) {
+        grid.innerHTML = `<p style="color:var(--muted);">No vlogs yet.</p>`;
+        return;
+      }
+      grid.innerHTML = list.map(v => `
         <div class="video-card" onclick="openVideoModal('${v.id}')">
           <div class="video-thumb">
             <div class="play-overlay">&#9654;</div>
-            <span class="duration">${v.duration}</span>
+            <span class="duration">${escapeHtml(v.duration || '')}</span>
           </div>
           <div class="video-info">
             <div class="ep-type">Vlog</div>
             <h3>${escapeHtml(v.title)}</h3>
-            <div class="ep-meta">${v.date}</div>
+            <div class="ep-meta">${escapeHtml(v.date || '')}</div>
             <div class="ep-desc">${escapeHtml(v.desc)}</div>
+            ${adminMode ? `<button class="ep-play" onclick="event.stopPropagation(); editEpisode('${v.id}')" aria-label="Edit" style="width:32px;height:32px;font-size:14px;">&hellip;</button>` : ''}
           </div>
         </div>
       `).join('');
@@ -1039,27 +1196,38 @@
 
     function renderCoffeeTalk() {
       const grid = document.getElementById('coffeeGrid');
-      grid.innerHTML = COFFEETALK.map(ep => `
+      const list = COFFEETALK();
+      if (!list.length) {
+        grid.innerHTML = `<p style="color:var(--muted);">No Coffee Talk episodes yet.</p>`;
+        return;
+      }
+      grid.innerHTML = list.map(ep => `
         <div class="episode-card" onclick="playCoffeeTalk('${ep.id}')">
           <div class="ep-art coffeetalk">
             &#9749;
-            <span class="ep-num">${ep.num}</span>
+            <span class="ep-num">${escapeHtml(ep.num || '')}</span>
           </div>
           <div class="ep-info">
-            <div class="ep-type coffeetalk">Coffee Talk \u2022 Episode ${ep.num}</div>
+            <div class="ep-type coffeetalk">Coffee Talk \u2022 Episode ${escapeHtml(ep.num || '')}</div>
             <h3>${escapeHtml(ep.title)}</h3>
-            <div class="ep-meta">${ep.date} \u2022 ${ep.duration}</div>
+            <div class="ep-meta">${escapeHtml(ep.date || '')} \u2022 ${escapeHtml(ep.duration || '')}</div>
             <div class="ep-desc">${escapeHtml(ep.desc)}</div>
           </div>
-          <button class="ep-play" onclick="event.stopPropagation(); playCoffeeTalk('${ep.id}')" aria-label="Play">&#9654;</button>
+          ${adminMode ? `
+            <div style="display:flex;flex-direction:column;gap:6px;align-self:center;flex-shrink:0;">
+              <button class="ep-play" onclick="event.stopPropagation(); editEpisode('${ep.id}')" aria-label="Edit" title="Edit">&hellip;</button>
+            </div>
+          ` : `
+            <button class="ep-play" onclick="event.stopPropagation(); playCoffeeTalk('${ep.id}')" aria-label="Play">&#9654;</button>
+          `}
         </div>
       `).join('');
     }
 
     function playCoffeeTalk(id) {
-      const ep = COFFEETALK.find(e => e.id === id);
+      const ep = COFFEETALK().find(e => e.id === id);
       if (!ep) return;
-      if (ep.hasVideo && ep.videoId) {
+      if (ep.videoId) {
         openVideoModalRaw(ep.title, ep.date, ep.duration, ep.desc, ep.videoId, 'Coffee Talk');
       } else {
         currentEpisode = { ...ep, num: ep.num, season: 'Coffee Talk' };
@@ -1079,7 +1247,7 @@
     }
 
     function playEpisode(id) {
-      const ep = PODCASTS.find(p => p.id === id);
+      const ep = PODCASTS().find(p => p.id === id);
       if (!ep) return;
       currentEpisode = ep;
       playing = false;
@@ -1099,6 +1267,15 @@
     }
 
     function togglePlay() {
+      if (!currentEpisode) return;
+      if (currentEpisode.audioUrl) {
+        const audio = document.getElementById('audioEl');
+        if (!audio) return;
+        audio.src = currentEpisode.audioUrl;
+        if (playing) { audio.pause(); }
+        else { audio.play().catch(() => showToast('Audio could not play.')); }
+        return;
+      }
       playing = !playing;
       document.getElementById('playBtn').innerHTML = playing ? '&#10074;&#10074;' : '&#9654;';
 
@@ -1106,13 +1283,13 @@
         playInterval = setInterval(() => {
           if (!currentEpisode) return;
           playProgress += playbackSpeed;
-          if (playProgress >= currentEpisode.durationSec) {
+          if (playProgress >= (currentEpisode.durationSec || 0)) {
             playProgress = 0;
             playing = false;
             document.getElementById('playBtn').innerHTML = '&#9654;';
             clearInterval(playInterval);
           }
-          const pct = (playProgress / currentEpisode.durationSec) * 100;
+          const pct = ((currentEpisode.durationSec || 1) > 0) ? (playProgress / currentEpisode.durationSec) * 100 : 0;
           document.getElementById('progressFill').style.width = pct + '%';
           document.getElementById('currentTime').textContent = formatTime(playProgress);
         }, 1000);
@@ -1126,7 +1303,12 @@
       const bar = e.currentTarget;
       const rect = bar.getBoundingClientRect();
       const pct = (e.clientX - rect.left) / rect.width;
-      playProgress = Math.floor(pct * currentEpisode.durationSec);
+      if (currentEpisode.audioUrl) {
+        const audio = document.getElementById('audioEl');
+        if (audio && audio.duration) audio.currentTime = pct * audio.duration;
+        return;
+      }
+      playProgress = Math.floor(pct * (currentEpisode.durationSec || 0));
       document.getElementById('progressFill').style.width = (pct * 100) + '%';
       document.getElementById('currentTime').textContent = formatTime(playProgress);
     }
@@ -1135,10 +1317,12 @@
       const idx = speeds.indexOf(playbackSpeed);
       playbackSpeed = speeds[(idx + 1) % speeds.length];
       document.getElementById('speedBtn').textContent = playbackSpeed + 'x';
+      const audio = document.getElementById('audioEl');
+      if (audio) audio.playbackRate = playbackSpeed;
     }
 
     function openVideoModal(id) {
-      const v = VLOGS.find(vid => vid.id === id);
+      const v = VLOGS().find(vid => vid.id === id);
       if (!v) return;
       openVideoModalRaw(v.title, v.date, v.duration, v.desc, v.videoId, 'Vlog');
     }
@@ -1158,14 +1342,226 @@
       document.body.style.overflow = '';
     }
 
+    // ADMIN MODE
+    function openEpisodeModal() {
+      document.getElementById('episodeModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEpisodeModal() {
+      document.getElementById('episodeModal').classList.remove('open');
+      document.getElementById('deleteConfirm').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function openCreateEpisode() {
+      if (!adminMode) return;
+      document.getElementById('editId').value = '';
+      document.getElementById('episodeForm').reset();
+      document.getElementById('mdType').value = 'podcast';
+      document.getElementById('mdFeatured').checked = false;
+      document.getElementById('episodeModalTitle').textContent = 'New Episode';
+      document.getElementById('episodeSubmitBtn').textContent = 'Create Episode';
+      document.getElementById('deleteConfirm').classList.remove('show');
+      document.getElementById('deleteEpisodeBtn').style.display = 'none';
+      openEpisodeModal();
+    }
+
+    function editEpisode(id) {
+      if (!adminMode) return;
+      const ep = media.find(m => m.id === id);
+      if (!ep) return;
+      document.getElementById('editId').value = ep.id;
+      document.getElementById('mdType').value = ep.type || 'podcast';
+      document.getElementById('mdTitle').value = ep.title || '';
+      document.getElementById('mdDate').value = ep.date || '';
+      document.getElementById('mdDuration').value = ep.duration || '';
+      document.getElementById('mdNum').value = ep.num || '';
+      document.getElementById('mdSeason').value = ep.season || '';
+      document.getElementById('mdAudioUrl').value = ep.audioUrl || '';
+      document.getElementById('mdVideoId').value = ep.videoId || '';
+      document.getElementById('mdDesc').value = ep.desc || '';
+      document.getElementById('mdFeatured').checked = Boolean(ep.featured);
+      document.getElementById('episodeModalTitle').textContent = 'Edit Episode';
+      document.getElementById('episodeSubmitBtn').textContent = 'Update Episode';
+      document.getElementById('deleteConfirm').classList.remove('show');
+      pendingDeleteId = ep.id;
+      document.getElementById('deleteEpisodeBtn').style.display = 'inline-block';
+      openEpisodeModal();
+    }
+
+    async function saveEpisode(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editId').value;
+      const payload = {
+        type: document.getElementById('mdType').value,
+        title: document.getElementById('mdTitle').value.trim(),
+        date: document.getElementById('mdDate').value.trim(),
+        duration: document.getElementById('mdDuration').value.trim(),
+        num: document.getElementById('mdNum').value.trim(),
+        season: document.getElementById('mdSeason').value.trim(),
+        audioUrl: document.getElementById('mdAudioUrl').value.trim(),
+        videoId: document.getElementById('mdVideoId').value.trim(),
+        desc: document.getElementById('mdDesc').value.trim(),
+        featured: document.getElementById('mdFeatured').checked ? 'true' : 'false',
+      };
+      if (!payload.title) {
+        showToast('Title is required.');
+        return;
+      }
+      try {
+        const action = editId ? 'update' : 'add';
+        if (editId) payload.id = editId;
+        const res = await fetch(API_BASE + '?action=' + action + '&key=' + encodeURIComponent(adminKey), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          showToast(data.error || 'Save failed.');
+          return;
+        }
+      } catch (err) {
+        showToast('Network error. Episode not saved.');
+        return;
+      }
+      closeEpisodeModal();
+      await fetchMedia();
+      showToast(editId ? 'Episode updated.' : 'Episode created.');
+    }
+
+    function confirmDeleteEpisode() {
+      document.getElementById('deleteConfirm').classList.add('show');
+    }
+
+    function cancelDeleteEpisode() {
+      document.getElementById('deleteConfirm').classList.remove('show');
+    }
+
+    async function executeDeleteEpisode() {
+      const id = pendingDeleteId;
+      if (!id) return;
+      pendingDeleteId = null;
+      document.getElementById('deleteConfirm').classList.remove('show');
+      try {
+        const res = await fetch(API_BASE + '?action=delete&key=' + encodeURIComponent(adminKey), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        if (!res.ok) {
+          showToast('Delete failed.');
+          return;
+        }
+      } catch (err) {
+        showToast('Network error. Episode not deleted.');
+        return;
+      }
+      closeEpisodeModal();
+      await fetchMedia();
+      showToast('Episode deleted.');
+    }
+
+    function toggleAdminMode() {
+      if (adminMode) {
+        adminMode = false;
+        document.body.classList.remove('admin-mode');
+        showToast('Admin mode OFF');
+        fetchMedia();
+        return;
+      }
+      if (adminKey) {
+        adminMode = true;
+        document.body.classList.add('admin-mode');
+        showToast('Admin mode ON');
+        fetchMedia();
+        return;
+      }
+      document.getElementById('adminKeyOverlay').classList.add('open');
+      document.getElementById('adminKeyInput').focus();
+    }
+
+    async function submitAdminKey() {
+      const key = document.getElementById('adminKeyInput').value.trim();
+      if (!key) return;
+      document.getElementById('adminKeyError').textContent = '';
+      try {
+        const res = await fetch(API_BASE + '?action=list&key=' + encodeURIComponent(key));
+        if (res.ok) {
+          adminKey = key;
+          sessionStorage.setItem('llr-admin-key', key);
+          adminMode = true;
+          document.body.classList.add('admin-mode');
+          document.getElementById('adminKeyOverlay').classList.remove('open');
+          document.getElementById('adminKeyInput').value = '';
+          showToast('Admin mode ON');
+          fetchMedia();
+        } else {
+          document.getElementById('adminKeyError').textContent = 'Invalid key.';
+        }
+      } catch (err) {
+        document.getElementById('adminKeyError').textContent = 'Network error.';
+      }
+    }
+
+    function closeAdminKey() {
+      document.getElementById('adminKeyOverlay').classList.remove('open');
+      document.getElementById('adminKeyInput').value = '';
+      document.getElementById('adminKeyError').textContent = '';
+    }
+
+    // KEYBOARD SHORTCUTS
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeVideoModal();
+      if (e.key === 'Escape') {
+        if (document.getElementById('adminKeyOverlay').classList.contains('open')) {
+          closeAdminKey();
+        } else if (document.getElementById('episodeModal').classList.contains('open')) {
+          closeEpisodeModal();
+        } else {
+          closeVideoModal();
+        }
+      }
+      if (e.key === 'a' || e.key === 'A') {
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) return;
+        if (document.getElementById('adminKeyOverlay').classList.contains('open')) return;
+        if (document.querySelector('.overlay.open')) return;
+        toggleAdminMode();
+      }
     });
 
-    loadFeatured();
-    renderPodcasts();
-    renderVlogs();
-    renderCoffeeTalk();
+    document.getElementById('adminKeyInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitAdminKey();
+      if (e.key === 'Escape') closeAdminKey();
+    });
+
+    const audioEl = document.getElementById('audioEl');
+    audioEl.addEventListener('play', () => {
+      playing = true;
+      document.getElementById('playBtn').innerHTML = '&#10074;&#10074;';
+    });
+    audioEl.addEventListener('pause', () => {
+      playing = false;
+      document.getElementById('playBtn').innerHTML = '&#9654;';
+    });
+    audioEl.addEventListener('timeupdate', () => {
+      if (!currentEpisode || !audioEl.duration) return;
+      document.getElementById('progressFill').style.width = ((audioEl.currentTime / audioEl.duration) * 100) + '%';
+      document.getElementById('currentTime').textContent = formatTime(audioEl.currentTime);
+    });
+    audioEl.addEventListener('loadedmetadata', () => {
+      if (audioEl.duration && !currentEpisode.durationSec) {
+        document.getElementById('totalTime').textContent = formatTime(audioEl.duration);
+      }
+    });
+    audioEl.addEventListener('ended', () => {
+      playing = false;
+      document.getElementById('playBtn').innerHTML = '&#9654;';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('currentTime').textContent = '0:00';
+    });
+
+    fetchMedia();
   </script>
 </body>
 </html>

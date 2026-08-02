@@ -9,7 +9,7 @@ Static site for Lost Limb Riders (nonprofit motorcycle community). No build syst
 ### Pages
 - `index.html` — homepage (hero, book, newsletter signup with free book download, guestbook, contact)
 - `events.html` — interactive calendar (month/week views, CRUD, category filters, hidden admin mode via A keypress)
-- `media.html` — podcast player, YouTube vlogs, Coffee Talk episodes, subscribe links
+- `media.html` — podcast player, YouTube vlogs, Coffee Talk episodes, subscribe links; admin mode via A keypress (CRUD episodes backed by `/api/media`)
 - `mission.html` — mission statement, board, programs, donate
 - `admin.html` — admin dashboard (stats, subscriber profiles, visitor log, newsletter compose/preview)
 
@@ -20,17 +20,19 @@ Static site for Lost Limb Riders (nonprofit motorcycle community). No build syst
 - `api/admin.js` — admin API: stats, subscriber list, visitor log (paginated), newsletter HTML builder
 - `api/guestbook.js` — guestbook CRUD, download, clear (admin key auth)
 - `api/cron-newsletter.js` — Vercel Cron sender: builds and emails newsletter to all subscribers via Resend
+- `api/media.js` — media CRUD: list (public, auto-seeds `llr:media`), add/update/delete (admin key auth)
 
 ### Shared Library
 - `lib/http.js` — JSON responses, admin key check (timing-safe), input cleaning, IP extraction
 - `lib/storage.js` — Vercel KV access + key names + list caps
 - `lib/geo.js` — ip-api.com geolocation lookup
 - `lib/newsletter.js` — newsletter HTML builder (template + events)
-- `lib/seed.js` — seed events + the email template (embedded, source of truth)
+- `lib/seed.js` — seed events + seed media episodes + the email template (embedded, source of truth)
 
 ### Storage (Vercel KV)
 Keys stored as JSON arrays under `llr:*`:
 - `llr:events` — event objects `{ id, title, date, endDate, category, description, ... }`
+- `llr:media` — media episodes `{ id, type: podcast|vlog|coffeetalk, title, date, duration, durationSec, desc, audioUrl, videoId, featured, ... }`
 - `llr:subscribers` — subscriber profiles (max 5000)
 - `llr:visitors` — visitor entries (max 5000, structured objects)
 - `llr:guestbook` — guestbook entries (max 500)
