@@ -771,7 +771,7 @@ If any required stage fails:
 
 **STOP THE COMPLETION CLAIM.**
 
-Report the exact failed stage, the error encountered, and corrective action taken or required.
+Report the exact failed stage, the error encountered, and corrective action taken or required. **The workflow remains blocked until you (the human) confirm the change should proceed.** No change is complete without your explicit confirmation after any failure.
 
 ### EXECUTIVE RULE
 

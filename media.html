@@ -656,11 +656,6 @@
       border-top: 1px solid var(--line);
     }
 
-    /* ADMIN */
-    body.admin-mode .admin-only { display: inline-flex !important; }
-    body.admin-mode .admin-only-flex { display: flex !important; }
-    .admin-only, .admin-only-flex { display: none !important; }
-
     .toast {
       position: fixed;
       bottom: 24px;
@@ -679,109 +674,6 @@
       transition: all .25s;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 400;
-      background: rgba(0,0,0,.75);
-      backdrop-filter: blur(10px);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .overlay.open { display: flex; }
-
-    .admin-key-card {
-      width: 100%;
-      max-width: 380px;
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
-    }
-    .admin-key-card h3 { margin: 0 0 6px; font-size: 20px; text-transform: uppercase; letter-spacing: -.02em; }
-    .admin-key-card p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
-    .admin-key-card input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255,255,255,.05);
-      color: var(--white);
-      font-size: 15px;
-      outline: none;
-      margin-bottom: 12px;
-      box-sizing: border-box;
-    }
-    .admin-key-card input:focus { border-color: var(--orange); }
-    .admin-key-card .error { color: #ef4444; font-size: 13px; margin-bottom: 12px; min-height: 16px; }
-    .admin-key-card .actions { display: flex; gap: 10px; }
-    .admin-key-card .actions .btn { flex: 1; justify-content: center; }
-
-    .media-modal {
-      width: 100%;
-      max-width: 640px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 28px;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
-      box-shadow: 0 40px 100px rgba(0,0,0,.6);
-      position: relative;
-    }
-    .media-modal h3 { margin: 0 0 20px; font-size: 22px; text-transform: uppercase; letter-spacing: -.02em; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .form-field label { display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
-    .form-field input, .form-field select, .form-field textarea {
-      width: 100%;
-      padding: 11px 13px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255,255,255,.05);
-      color: var(--white);
-      font-size: 14px;
-      outline: none;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--orange); }
-    .form-field textarea { resize: vertical; min-height: 90px; }
-    .form-field select option { background: #111; }
-    .checkbox-field { display: flex; align-items: center; gap: 10px; }
-    .checkbox-field input { width: 18px; height: 18px; }
-    .checkbox-field label { margin: 0; font-size: 14px; font-weight: 800; color: var(--white); text-transform: none; letter-spacing: 0; }
-    .form-actions { display: flex; gap: 10px; margin-top: 22px; }
-    .form-actions .btn { justify-content: center; }
-    .delete-btn {
-      padding: 8px 14px;
-      border: 1px solid rgba(239,68,68,.5);
-      border-radius: 10px;
-      background: rgba(239,68,68,.12);
-      color: #f87171;
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .delete-btn:hover { background: rgba(239,68,68,.25); }
-    .delete-confirm-bar {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      margin-top: 12px;
-      padding: 10px 14px;
-      border: 1px solid rgba(239,68,68,.5);
-      border-radius: 10px;
-      background: rgba(239,68,68,.1);
-      color: #fca5a5;
-      font-size: 13px;
-    }
-    .delete-confirm-bar.show { display: flex; }
 
      /* LIVE STREAM */
      .live-stream-section { margin-bottom: 40px; }
@@ -979,9 +871,8 @@
     <div class="hero-actions">
       <a class="btn btn-primary" href="#podcasts">Listen to the Podcast</a>
       <a class="btn btn-secondary" href="#vlogs">Watch the Vlogs</a>
-      <a class="btn btn-ghost" href="#coffeetalk">Coffee Talk</a>
-      <button class="btn btn-primary admin-only" onclick="openCreateEpisode()" style="justify-content:center;">+ New Episode</button>
-    </div>
+       <a class="btn btn-ghost" href="#coffeetalk">Coffee Talk</a>
+     </div>
   </header>
 
   <main>
@@ -993,10 +884,9 @@
           <p style="color:var(--muted); font-size:18px; line-height:1.5;">Watch us ride, record podcasts, and connect in real time. Check the schedule below for upcoming broadcasts.</p>
         </div>
 
-        <div class="live-meta" id="liveMeta">
+         <div class="live-meta" id="liveMeta">
           <span class="live-badge offline" id="liveBadge">Offline</span>
           <h2 class="live-title" id="liveTitle">Lost Limb Riders Live</h2>
-          <button class="btn btn-ghost btn-sm admin-only" onclick="openStreamModal()" style="margin-left:auto;">Stream Settings</button>
         </div>
         <p class="live-desc" id="liveDesc" style="margin-bottom:20px; color:var(--muted); font-size:15px; line-height:1.6;"></p>
 
@@ -1163,152 +1053,17 @@
     </div>
   </div>
 
-  <!-- ADMIN KEY OVERLAY -->
-  <div class="overlay" id="adminKeyOverlay">
-    <div class="admin-key-card">
-      <h3>Admin Access</h3>
-      <p>Enter the admin key to manage episodes.</p>
-      <input id="adminKeyInput" type="password" placeholder="Admin key" autocomplete="off">
-      <div class="error" id="adminKeyError"></div>
-      <div class="actions">
-        <button class="btn btn-secondary" onclick="closeAdminKey()" style="justify-content:center;">Cancel</button>
-        <button class="btn btn-primary" onclick="submitAdminKey()" style="justify-content:center;">Unlock</button>
-      </div>
-    </div>
-  </div>
+   <div class="toast" id="toast"></div>
 
-  <!-- EPISODE MODAL -->
-  <div class="overlay" id="episodeModal">
-    <div class="media-modal">
-      <h3 id="episodeModalTitle">New Episode</h3>
-      <form id="episodeForm" onsubmit="saveEpisode(event)">
-        <input type="hidden" id="editId" value="">
-        <div class="form-row">
-          <div class="form-field">
-            <label>Type</label>
-            <select id="mdType">
-              <option value="podcast">Podcast</option>
-              <option value="vlog">Vlog</option>
-              <option value="coffeetalk">Coffee Talk</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Title *</label>
-            <input id="mdTitle" maxlength="300" placeholder="Episode title">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Date</label>
-            <input id="mdDate" maxlength="30" placeholder="e.g. Aug 2026">
-          </div>
-          <div class="form-field">
-            <label>Duration</label>
-            <input id="mdDuration" maxlength="12" placeholder="e.g. 42:18">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Episode Number</label>
-            <input id="mdNum" maxlength="10" placeholder="e.g. 01">
-          </div>
-          <div class="form-field">
-            <label>Season</label>
-            <input id="mdSeason" maxlength="10" placeholder="e.g. 1">
-          </div>
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Audio URL (podcast / audio-only)</label>
-          <input id="mdAudioUrl" maxlength="1000" placeholder="https://.../episode.mp3">
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>YouTube Video ID (vlogs / video episodes)</label>
-          <input id="mdVideoId" maxlength="200" placeholder="e.g. dQw4w9WgXcQ">
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Description</label>
-          <textarea id="mdDesc" maxlength="4000" placeholder="Episode description"></textarea>
-        </div>
-        <div class="checkbox-field" style="margin-bottom:20px;">
-          <input type="checkbox" id="mdFeatured">
-          <label for="mdFeatured">Featured (show in "Now Playing")</label>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" onclick="closeEpisodeModal()">Cancel</button>
-          <button type="button" class="delete-btn" id="deleteEpisodeBtn" onclick="confirmDeleteEpisode()" style="display:none;">Delete</button>
-          <button type="submit" class="btn btn-primary" id="episodeSubmitBtn">Create Episode</button>
-        </div>
-        <div class="delete-confirm-bar" id="deleteConfirm">
-          <span>Delete this episode? This cannot be undone.</span>
-          <button type="button" class="delete-btn" onclick="executeDeleteEpisode()">Yes, Delete</button>
-          <button type="button" class="delete-btn" onclick="cancelDeleteEpisode()" style="border-color:rgba(255,255,255,.2);color:var(--muted);background:transparent;">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- STREAM MODAL -->
-  <div class="overlay" id="streamModal">
-    <div class="media-modal">
-      <h3 id="streamModalTitle">Live Stream Settings</h3>
-      <form id="streamForm" onsubmit="saveStream(event)">
-        <div class="form-row">
-          <div class="form-field">
-            <label>Platform</label>
-            <select id="smPlatform">
-              <option value="youtube">YouTube Live</option>
-              <option value="twitch">Twitch</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Status</label>
-            <select id="smStatus">
-              <option value="offline">Offline</option>
-              <option value="live">Live</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Stream ID (YouTube video ID or Twitch channel name)</label>
-          <input id="smStreamId" maxlength="200" placeholder="e.g. dQw4w9WgXcQ or lostlimbriders">
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Title</label>
-          <input id="smTitle" maxlength="200" placeholder="e.g. Live from the Fall Rally">
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Description</label>
-          <textarea id="smDesc" maxlength="2000" placeholder="What are you streaming?"></textarea>
-        </div>
-        <div class="form-field" style="margin-bottom:14px;">
-          <label>Viewer Count (for display)</label>
-          <input id="smViewers" type="number" min="0" placeholder="e.g. 42">
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" onclick="closeStreamModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="toast" id="toast"></div>
-
-  <script>
-    const API_BASE = '/api/media';
-    const STREAM_API = '/api/stream';
-    let media = [];
-    let streamConfig = null;
-    let streamPoll = null;
-    let adminMode = false;
-    let adminKey = sessionStorage.getItem('llr-admin-key') || '';
-    let playing = false;
-    let currentEpisode = null;
-    let playProgress = 0;
-    let playInterval = null;
-    let playbackSpeed = 1;
-    let pendingDeleteId = null;
-    const speeds = [1, 1.25, 1.5, 2, 0.75];
+   <script>
+     const API_BASE = '/api/media';
+     let media = [];
+     let playing = false;
+     let currentEpisode = null;
+     let playProgress = 0;
+     let playInterval = null;
+      let playbackSpeed = 1;
+      const speeds = [1, 1.25, 1.5, 2, 0.75];
 
     const byType = (t) => media.filter(m => m.type === t);
     const PODCASTS = () => byType('podcast');
@@ -1344,146 +1099,6 @@
       renderPodcasts();
       renderVlogs();
       renderCoffeeTalk();
-    }
-
-    async function fetchStream() {
-      try {
-        const res = await fetch(STREAM_API + '?action=get');
-        const data = await res.json();
-        if (data.stream) {
-          streamConfig = data.stream;
-          renderLiveStream();
-        }
-      } catch (e) {
-        streamConfig = null;
-      }
-    }
-
-    function getStreamEmbedUrl() {
-      if (!streamConfig || !streamConfig.streamId) return null;
-      const id = encodeURIComponent(streamConfig.streamId);
-      if (streamConfig.platform === 'twitch') {
-        return `https://player.twitch.tv/?channel=${id}&parent=lostlimbriders.org&autoplay=false`;
-      }
-      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`;
-    }
-
-    function renderLiveStream() {
-      const badge = document.getElementById('liveBadge');
-      const title = document.getElementById('liveTitle');
-      const desc = document.getElementById('liveDesc');
-      const wrapper = document.getElementById('livePlayerWrapper');
-      const meta = document.getElementById('liveMeta');
-
-      const status = streamConfig.status || 'offline';
-      const isLive = status === 'live';
-
-      badge.className = 'live-badge ' + (isLive ? 'live' : 'offline');
-      badge.textContent = isLive ? 'Live Now' : 'Offline';
-      badge.classList.remove('live-now', 'scheduled', 'offline');
-      if (isLive) badge.classList.add('live-now');
-      else badge.classList.add('offline');
-
-      title.textContent = streamConfig.title || 'Lost Limb Riders Live';
-      desc.textContent = streamConfig.description || '';
-
-      const embedUrl = getStreamEmbedUrl();
-      if (isLive && embedUrl) {
-        wrapper.innerHTML = '<div class="live-frame"><iframe src="' + embedUrl + '" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>';
-        if (streamConfig.viewerCount) {
-          const viewers = document.createElement('span');
-          viewers.className = 'viewer-count';
-          viewers.innerHTML = '&#128266; ' + streamConfig.viewerCount + ' watching';
-          meta.appendChild(viewers);
-        }
-      } else {
-        wrapper.innerHTML = '<div class="live-placeholder"><div class="placeholder-icon">&#127911;</div><h3>Live Streams Coming Soon</h3><p>We stream weekly rides, podcast recordings, and community events. Check back during scheduled times or subscribe to get notified when we go live.</p></div>';
-        meta.querySelectorAll('.viewer-count').forEach(el => el.remove());
-      }
-
-      renderSchedule();
-    }
-
-    function renderSchedule() {
-      const grid = document.getElementById('scheduleList');
-      if (!streamConfig || !streamConfig.schedule || !streamConfig.schedule.length) {
-        grid.innerHTML = '<p style="color:var(--muted);">No scheduled streams yet.</p>';
-        return;
-      }
-      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const today = new Date();
-      const currentDay = today.getDay();
-      const currentHour = today.getHours();
-      const todayStart = new Date(today);
-      todayStart.setHours(0, 0, 0, 0);
-      grid.innerHTML = streamConfig.schedule.map(item => {
-        const isRecurring = item.recurring !== false;
-        const label = item.day || (item.date ? new Date(item.date).toLocaleDateString() : 'TBD');
-        let upcoming = false;
-        if (isRecurring) {
-          const dayIdx = days.indexOf(item.day);
-          if (dayIdx !== -1) upcoming = dayIdx === currentDay && (parseInt(item.time) <= currentHour + 3);
-        } else if (item.date) {
-          const d = new Date(item.date);
-          upcoming = d >= todayStart;
-        }
-        return '<div class="schedule-item">' +
-          '<div class="schedule-day">' + escapeHtml(label) + '</div>' +
-          '<div class="schedule-time">' + escapeHtml(item.time || '') + '</div>' +
-          '<div class="schedule-info">' +
-            '<h4>' + escapeHtml(item.title || '') + '</h4>' +
-            '<p>' + escapeHtml(item.description || '') + '</p>' +
-          '</div>' +
-          (upcoming ? '<span class="live-badge live" style="margin-left:auto; font-size:10px; padding:4px 10px;">Upcoming</span>' : '') +
-        '</div>';
-      }).join('');
-    }
-
-    function openStreamModal() {
-      if (!adminMode) return;
-      if (!streamConfig) return;
-      document.getElementById('smPlatform').value = streamConfig.platform || 'youtube';
-      document.getElementById('smStreamId').value = streamConfig.streamId || '';
-      document.getElementById('smTitle').value = streamConfig.title || '';
-      document.getElementById('smDesc').value = streamConfig.description || '';
-      document.getElementById('smStatus').value = streamConfig.status || 'offline';
-      document.getElementById('smViewers').value = streamConfig.viewerCount || 0;
-      document.getElementById('streamModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeStreamModal() {
-      document.getElementById('streamModal').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    async function saveStream(e) {
-      e.preventDefault();
-      const payload = {
-        platform: document.getElementById('smPlatform').value,
-        streamId: document.getElementById('smStreamId').value.trim(),
-        title: document.getElementById('smTitle').value.trim(),
-        description: document.getElementById('smDesc').value.trim(),
-        status: document.getElementById('smStatus').value,
-        viewerCount: parseInt(document.getElementById('smViewers').value, 10) || 0,
-      };
-      try {
-        const res = await fetch(STREAM_API + '?action=update&key=' + encodeURIComponent(adminKey), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          showToast(data.error || 'Save failed.');
-          return;
-        }
-        closeStreamModal();
-        await fetchStream();
-        showToast('Stream settings updated.');
-      } catch (err) {
-        showToast('Network error.');
-      }
     }
 
     function loadFeatured() {
@@ -1530,13 +1145,7 @@
             <div class="ep-meta">${escapeHtml(ep.date || '')} \u2022 ${escapeHtml(ep.duration || '')}</div>
             <div class="ep-desc">${escapeHtml(ep.desc)}</div>
           </div>
-          ${adminMode ? `
-            <div style="display:flex;flex-direction:column;gap:6px;align-self:center;flex-shrink:0;">
-              <button class="ep-play" onclick="event.stopPropagation(); editEpisode('${ep.id}')" aria-label="Edit" title="Edit">&hellip;</button>
-            </div>
-          ` : `
-            <button class="ep-play" onclick="event.stopPropagation(); playEpisode('${ep.id}')" aria-label="Play">&#9654;</button>
-          `}
+          <button class="ep-play" onclick="event.stopPropagation(); playEpisode('${ep.id}')" aria-label="Play">&#9654;</button>
         </div>
       `).join('');
     }
@@ -1559,7 +1168,6 @@
             <h3>${escapeHtml(v.title)}</h3>
             <div class="ep-meta">${escapeHtml(v.date || '')}</div>
             <div class="ep-desc">${escapeHtml(v.desc)}</div>
-            ${adminMode ? `<button class="ep-play" onclick="event.stopPropagation(); editEpisode('${v.id}')" aria-label="Edit" style="width:32px;height:32px;font-size:14px;">&hellip;</button>` : ''}
           </div>
         </div>
       `).join('');
@@ -1584,13 +1192,7 @@
             <div class="ep-meta">${escapeHtml(ep.date || '')} \u2022 ${escapeHtml(ep.duration || '')}</div>
             <div class="ep-desc">${escapeHtml(ep.desc)}</div>
           </div>
-          ${adminMode ? `
-            <div style="display:flex;flex-direction:column;gap:6px;align-self:center;flex-shrink:0;">
-              <button class="ep-play" onclick="event.stopPropagation(); editEpisode('${ep.id}')" aria-label="Edit" title="Edit">&hellip;</button>
-            </div>
-          ` : `
-            <button class="ep-play" onclick="event.stopPropagation(); playCoffeeTalk('${ep.id}')" aria-label="Play">&#9654;</button>
-          `}
+          <button class="ep-play" onclick="event.stopPropagation(); playCoffeeTalk('${ep.id}')" aria-label="Play">&#9654;</button>
         </div>
       `).join('');
     }
@@ -1713,202 +1315,11 @@
       document.body.style.overflow = '';
     }
 
-    // ADMIN MODE
-    function openEpisodeModal() {
-      document.getElementById('episodeModal').classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeEpisodeModal() {
-      document.getElementById('episodeModal').classList.remove('open');
-      document.getElementById('deleteConfirm').classList.remove('show');
-      document.body.style.overflow = '';
-    }
-
-    function openCreateEpisode() {
-      if (!adminMode) return;
-      document.getElementById('editId').value = '';
-      document.getElementById('episodeForm').reset();
-      document.getElementById('mdType').value = 'podcast';
-      document.getElementById('mdFeatured').checked = false;
-      document.getElementById('episodeModalTitle').textContent = 'New Episode';
-      document.getElementById('episodeSubmitBtn').textContent = 'Create Episode';
-      document.getElementById('deleteConfirm').classList.remove('show');
-      document.getElementById('deleteEpisodeBtn').style.display = 'none';
-      openEpisodeModal();
-    }
-
-    function editEpisode(id) {
-      if (!adminMode) return;
-      const ep = media.find(m => m.id === id);
-      if (!ep) return;
-      document.getElementById('editId').value = ep.id;
-      document.getElementById('mdType').value = ep.type || 'podcast';
-      document.getElementById('mdTitle').value = ep.title || '';
-      document.getElementById('mdDate').value = ep.date || '';
-      document.getElementById('mdDuration').value = ep.duration || '';
-      document.getElementById('mdNum').value = ep.num || '';
-      document.getElementById('mdSeason').value = ep.season || '';
-      document.getElementById('mdAudioUrl').value = ep.audioUrl || '';
-      document.getElementById('mdVideoId').value = ep.videoId || '';
-      document.getElementById('mdDesc').value = ep.desc || '';
-      document.getElementById('mdFeatured').checked = Boolean(ep.featured);
-      document.getElementById('episodeModalTitle').textContent = 'Edit Episode';
-      document.getElementById('episodeSubmitBtn').textContent = 'Update Episode';
-      document.getElementById('deleteConfirm').classList.remove('show');
-      pendingDeleteId = ep.id;
-      document.getElementById('deleteEpisodeBtn').style.display = 'inline-block';
-      openEpisodeModal();
-    }
-
-    async function saveEpisode(e) {
-      e.preventDefault();
-      const editId = document.getElementById('editId').value;
-      const payload = {
-        type: document.getElementById('mdType').value,
-        title: document.getElementById('mdTitle').value.trim(),
-        date: document.getElementById('mdDate').value.trim(),
-        duration: document.getElementById('mdDuration').value.trim(),
-        num: document.getElementById('mdNum').value.trim(),
-        season: document.getElementById('mdSeason').value.trim(),
-        audioUrl: document.getElementById('mdAudioUrl').value.trim(),
-        videoId: document.getElementById('mdVideoId').value.trim(),
-        desc: document.getElementById('mdDesc').value.trim(),
-        featured: document.getElementById('mdFeatured').checked ? 'true' : 'false',
-      };
-      if (!payload.title) {
-        showToast('Title is required.');
-        return;
-      }
-      try {
-        const action = editId ? 'update' : 'add';
-        if (editId) payload.id = editId;
-        const res = await fetch(API_BASE + '?action=' + action + '&key=' + encodeURIComponent(adminKey), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          showToast(data.error || 'Save failed.');
-          return;
-        }
-      } catch (err) {
-        showToast('Network error. Episode not saved.');
-        return;
-      }
-      closeEpisodeModal();
-      await fetchMedia();
-      showToast(editId ? 'Episode updated.' : 'Episode created.');
-    }
-
-    function confirmDeleteEpisode() {
-      document.getElementById('deleteConfirm').classList.add('show');
-    }
-
-    function cancelDeleteEpisode() {
-      document.getElementById('deleteConfirm').classList.remove('show');
-    }
-
-    async function executeDeleteEpisode() {
-      const id = pendingDeleteId;
-      if (!id) return;
-      pendingDeleteId = null;
-      document.getElementById('deleteConfirm').classList.remove('show');
-      try {
-        const res = await fetch(API_BASE + '?action=delete&key=' + encodeURIComponent(adminKey), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        });
-        if (!res.ok) {
-          showToast('Delete failed.');
-          return;
-        }
-      } catch (err) {
-        showToast('Network error. Episode not deleted.');
-        return;
-      }
-      closeEpisodeModal();
-      await fetchMedia();
-      showToast('Episode deleted.');
-    }
-
-    function toggleAdminMode() {
-      if (adminMode) {
-        adminMode = false;
-        document.body.classList.remove('admin-mode');
-        showToast('Admin mode OFF');
-        fetchMedia();
-        return;
-      }
-      if (adminKey) {
-        adminMode = true;
-        document.body.classList.add('admin-mode');
-          showToast('Admin mode ON');
-          fetchMedia();
-          fetchStream();
-        return;
-      }
-      document.getElementById('adminKeyOverlay').classList.add('open');
-      document.getElementById('adminKeyInput').focus();
-    }
-
-    async function submitAdminKey() {
-      const key = document.getElementById('adminKeyInput').value.trim();
-      if (!key) return;
-      document.getElementById('adminKeyError').textContent = '';
-      try {
-        const res = await fetch(API_BASE + '?action=list&key=' + encodeURIComponent(key));
-        if (res.ok) {
-          adminKey = key;
-          sessionStorage.setItem('llr-admin-key', key);
-          adminMode = true;
-          document.body.classList.add('admin-mode');
-          document.getElementById('adminKeyOverlay').classList.remove('open');
-          document.getElementById('adminKeyInput').value = '';
-          showToast('Admin mode ON');
-    fetchMedia();
-    fetchStream();
-    streamPoll = setInterval(fetchStream, 30000);
-        } else {
-          document.getElementById('adminKeyError').textContent = 'Invalid key.';
-        }
-      } catch (err) {
-        document.getElementById('adminKeyError').textContent = 'Network error.';
-      }
-    }
-
-    function closeAdminKey() {
-      document.getElementById('adminKeyOverlay').classList.remove('open');
-      document.getElementById('adminKeyInput').value = '';
-      document.getElementById('adminKeyError').textContent = '';
-    }
-
     // KEYBOARD SHORTCUTS
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
-        if (document.getElementById('adminKeyOverlay').classList.contains('open')) {
-          closeAdminKey();
-        } else if (document.getElementById('episodeModal').classList.contains('open')) {
-          closeEpisodeModal();
-        } else if (document.getElementById('streamModal').classList.contains('open')) {
-          closeStreamModal();
-        } else {
-          closeVideoModal();
-        }
+        closeVideoModal();
       }
-      if (e.key === 'a' || e.key === 'A') {
-        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) return;
-        if (document.getElementById('adminKeyOverlay').classList.contains('open')) return;
-        if (document.querySelector('.overlay.open')) return;
-        toggleAdminMode();
-      }
-    });
-
-    document.getElementById('adminKeyInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') submitAdminKey();
-      if (e.key === 'Escape') closeAdminKey();
     });
 
     const audioEl = document.getElementById('audioEl');
