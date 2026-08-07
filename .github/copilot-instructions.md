@@ -16,7 +16,7 @@ This is a static site for a nonprofit motorcycle community with no build system,
 - **admin.html** — Admin dashboard: statistics, subscriber profiles, visitor logs, newsletter builder
 
 ### Backend API Endpoints (Vercel Functions)
-All functions live in `api/*.js` and are served extensionless. All use JSON request/response. Admin operations require `GUESTBOOK_ADMIN_KEY` environment variable, passed via query param `?key=<value>` (or `X-Admin-Key` header).
+All functions live in `api/*.js` and are served extensionless. All use JSON request/response. Admin operations require `ADMIN_KEY` environment variable, passed via query param `?key=<value>` (or `X-Admin-Key` header).
 
 - **`/api/events`** — Event CRUD: `action=list` (public) returns events; `action=add|update|delete` (POST, admin only)
 - **`/api/newsletter`** — Newsletter signup (POST): name, email, device fingerprint, geolocation from ip-api.com
@@ -55,7 +55,7 @@ All data is JSON stored under `llr:*` keys. Use `lib/storage.js` helpers (`getLi
   **Keep these consistent across all files.** If adding new colors or tokens, define them in `:root` and document them here.
 
 ### Admin Authentication
-- Environment variable `GUESTBOOK_ADMIN_KEY` is the source of truth (set on Vercel).
+- Environment variable `ADMIN_KEY` is the source of truth (set on Vercel).
 - Frontend stores the admin key in `sessionStorage` with key `'llr-admin-key'` for the duration of the session.
 - All admin API calls include the key: `?key=<value>` in query string (or `X-Admin-Key` header).
 - Use timing-safe comparison via `lib/http.js` → `timingSafeStrEqual` / `isAdmin(req)`.
@@ -102,7 +102,7 @@ Changes are validated by manual testing in `vercel dev`.
 
 ## Environment Variables (Vercel Dashboard)
 
-- **GUESTBOOK_ADMIN_KEY** — Secret key for admin API operations. Generate: `openssl rand -base64 32`
+- **ADMIN_KEY** — Secret key for admin API operations. Generate: `openssl rand -base64 32`
 - **CRON_SECRET** — Secret sent by Vercel Cron as `Authorization: Bearer`; the cron endpoint refuses requests without it. Generate: `openssl rand -base64 32`
 - **RESEND_API_KEY** — Resend API key (email sending, free tier 100 emails/day)
 - **RESEND_FROM** — Sender address, e.g. `Lost Limb Riders <john.thompson@lostlimbriders.org>`
@@ -152,7 +152,7 @@ If `llr:*` keys look wrong:
 
 ### Admin Key Management
 - **Never** commit the actual admin key to the repository.
-- Store only in environment variable `GUESTBOOK_ADMIN_KEY` on Vercel.
+- Store only in environment variable `ADMIN_KEY` on Vercel.
 - Use timing-safe comparison (`lib/http.js` → `timingSafeStrEqual`).
 - Rotate the key periodically; update all clients accordingly.
 - Generate with: `openssl rand -base64 32`
@@ -223,7 +223,7 @@ When deploying changes:
 ## Troubleshooting
 
 **"Admin access required" even with correct key:**
-- Check `GUESTBOOK_ADMIN_KEY` env var is set on Vercel (not in code).
+- Check `ADMIN_KEY` env var is set on Vercel (not in code).
 - Verify key matches exactly (no extra spaces, encoding issues).
 - Clear browser `sessionStorage` and re-enter key: `sessionStorage.removeItem('llr-admin-key')`
 

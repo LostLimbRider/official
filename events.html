@@ -571,36 +571,6 @@
       font-weight: 700;
     }
 
-    .delete-btn {
-      margin-top: 20px;
-      padding: 10px 16px;
-      border: 1px solid rgba(239,68,68,.4);
-      border-radius: 10px;
-      background: rgba(239,68,68,.08);
-      color: #ef4444;
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .delete-btn:hover { background: rgba(239,68,68,.2); border-color: #ef4444; }
-
-    .delete-confirm-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 16px;
-      padding: 12px 16px;
-      background: rgba(239,68,68,.08);
-      border: 1px solid rgba(239,68,68,.25);
-      border-radius: 10px;
-      color: var(--white);
-      font-size: 13px;
-      font-weight: 700;
-    }
-
     .statement {
       text-align: center;
       padding: 80px 7vw;
@@ -660,82 +630,6 @@
 
     .fade-in { animation: fadeIn .3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .admin-only { display: none !important; }
-    body.admin-mode .admin-only { display: inline-flex !important; }
-    body.admin-mode .admin-only-block { display: block !important; }
-    body.admin-mode .admin-only-flex { display: flex !important; }
-
-    .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      padding: 12px 24px;
-      border-radius: 12px;
-      background: var(--orange);
-      color: #111;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: all .3s ease;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    .admin-key-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: rgba(0,0,0,.7);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-    }
-    .admin-key-overlay.open { display: flex; }
-    .admin-key-box {
-      padding: 32px;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
-      text-align: center;
-      max-width: 380px;
-      width: 100%;
-    }
-    .admin-key-box h3 {
-      margin-bottom: 12px;
-      font-size: 20px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-    .admin-key-box p {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 16px;
-    }
-    .admin-key-box input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #090909;
-      color: var(--white);
-      font-size: 16px;
-      text-align: center;
-      letter-spacing: .1em;
-      margin-bottom: 12px;
-    }
-    .admin-key-box input:focus {
-      border-color: var(--orange);
-      outline: 0;
-      box-shadow: 0 0 0 4px rgba(255,106,0,.16);
-    }
-    .admin-key-box .admin-key-actions { display: flex; gap: 10px; justify-content: center; }
-    .admin-key-error { color: #ef4444; font-size: 13px; font-weight: 700; margin-top: 8px; min-height: 18px; }
   </style>
 </head>
 <body>
@@ -774,12 +668,11 @@
           </div>
           <div class="controls-right">
             <div class="filters" id="filters"></div>
-            <div class="view-toggle">
-              <button class="active" onclick="setView('month')">Month</button>
-              <button onclick="setView('week')">Week</button>
-            </div>
-            <button class="btn btn-primary btn-sm admin-only" onclick="openCreateModal()">+ Add Event</button>
-          </div>
+             <div class="view-toggle">
+               <button class="active" onclick="setView('month')">Month</button>
+               <button onclick="setView('week')">Week</button>
+             </div>
+           </div>
         </div>
 
         <div class="sidebar">
@@ -805,77 +698,8 @@
     Lost Limb Riders Motorcycle Club &bull; Ride With Purpose &bull; Support Amputees &bull; Build Community &bull; Never Give Up
   </footer>
 
-  <div class="toast" id="toast"></div>
-
-  <div class="admin-key-overlay" id="adminKeyOverlay">
-    <div class="admin-key-box">
-      <h3>Admin <span class="orange">Access</span></h3>
-      <p>Enter the admin key to manage events.</p>
-      <input type="password" id="adminKeyInput" placeholder="Admin key" autofocus>
-      <div class="admin-key-actions">
-        <button class="btn btn-primary btn-sm" onclick="submitAdminKey()">Unlock</button>
-        <button class="btn btn-secondary btn-sm" onclick="closeAdminKey()">Cancel</button>
-      </div>
-      <div class="admin-key-error" id="adminKeyError"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="createModal">
-    <div class="modal">
-      <button class="modal-close" onclick="closeModal('createModal')" aria-label="Close">&times;</button>
-      <h2>Create <span class="orange">Event</span></h2>
-      <form id="eventForm" onsubmit="saveEvent(event)">
-        <input type="hidden" id="editId" value="">
-        <div class="form-group">
-          <label for="evTitle">Event Name</label>
-          <input id="evTitle" required placeholder="e.g. Freedom Ride 2026">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="evDate">Date</label>
-            <input id="evDate" type="date" required>
-          </div>
-          <div class="form-group">
-            <label for="evTime">Time</label>
-            <input id="evTime" type="time">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="evCategory">Category</label>
-            <select id="evCategory">
-              <option value="ride">Ride</option>
-              <option value="fundraiser">Fundraiser</option>
-              <option value="community">Community</option>
-              <option value="meeting">Meeting</option>
-              <option value="rally">Rally</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="evLocation">Location</label>
-            <input id="evLocation" placeholder="e.g. Fort Dodge, IA">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="evEnd">End Date (optional, for multi-day)</label>
-          <input id="evEnd" type="date">
-        </div>
-        <div class="form-group">
-          <label for="evDesc">Description</label>
-          <textarea id="evDesc" placeholder="Details about the event..."></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" id="formSubmitBtn">Create Event</button>
-          <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="detailModal">
-    <div class="modal" id="detailContent"></div>
-  </div>
-
+   <div class="modal-overlay" id="detailModal">
+     <div class="modal" id="detailContent"></div>
   <script>
     const API_BASE = '/api/events';
     const CATEGORY_META = {
@@ -886,11 +710,9 @@
       rally:      { label: 'Rally',      color: '--cat-rally' }
     };
 
-    let allEvents = [];
-    let currentYear, currentMonth, currentView = 'month';
-    let activeFilters = new Set(Object.keys(CATEGORY_META));
-    let adminMode = false;
-    let adminKey = sessionStorage.getItem('llr-admin-key') || '';
+     let allEvents = [];
+     let currentYear, currentMonth, currentView = 'month';
+     let activeFilters = new Set(Object.keys(CATEGORY_META));
 
     async function fetchEvents() {
       try {
@@ -919,13 +741,6 @@
       const ampm = hr >= 12 ? 'PM' : 'AM';
       const hr12 = hr === 0 ? 12 : hr > 12 ? hr - 12 : hr;
       return `${hr12}:${m} ${ampm}`;
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2200);
     }
 
     function init() {
@@ -1043,10 +858,8 @@
           cellEvents += `<div class="more-events">+${events.length - maxShow} more</div>`;
         }
 
-        const clickHandler = adminMode ? `openCreateModalForDate('${dateStr}')` : '';
-
         html += `
-          <div class="cal-cell${outside ? ' outside' : ''}${isToday ? ' today' : ''}" onclick="${clickHandler}">
+          <div class="cal-cell${outside ? ' outside' : ''}${isToday ? ' today' : ''}">
             <div class="day-num">${day}</div>
             ${cellEvents}
           </div>
@@ -1081,10 +894,8 @@
           </div>
         `).join('');
 
-        const clickHandler = adminMode ? `openCreateModalForDate('${dateStr}')` : '';
-
         html += `
-          <div class="cal-cell${isToday ? ' today' : ''}" style="min-height:160px;" onclick="${clickHandler}">
+          <div class="cal-cell${isToday ? ' today' : ''}" style="min-height:160px;">
             <div class="day-num">${d.getDate()}</div>
             ${cellEvents}
           </div>
@@ -1126,22 +937,6 @@
       }).join('');
     }
 
-    function openCreateModal() {
-      if (!adminMode) return;
-      document.getElementById('editId').value = '';
-      document.getElementById('eventForm').reset();
-      document.getElementById('formSubmitBtn').textContent = 'Create Event';
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('evDate').value = today;
-      openModal('createModal');
-    }
-
-    function openCreateModalForDate(dateStr) {
-      if (!adminMode) return;
-      openCreateModal();
-      document.getElementById('evDate').value = dateStr;
-    }
-
     function openModal(id) {
       document.getElementById(id).classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -1150,44 +945,6 @@
     function closeModal(id) {
       document.getElementById(id).classList.remove('open');
       document.body.style.overflow = '';
-    }
-
-    async function saveEvent(e) {
-      e.preventDefault();
-      const editId = document.getElementById('editId').value;
-      const eventData = {
-        title: document.getElementById('evTitle').value.trim(),
-        date: document.getElementById('evDate').value,
-        time: document.getElementById('evTime').value,
-        category: document.getElementById('evCategory').value,
-        location: document.getElementById('evLocation').value.trim(),
-        description: document.getElementById('evDesc').value.trim(),
-        endDate: document.getElementById('evEnd').value
-      };
-
-      try {
-        if (editId) {
-          eventData.id = editId;
-          await fetch(API_BASE + '?action=update&key=' + encodeURIComponent(adminKey), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(eventData)
-          });
-        } else {
-          await fetch(API_BASE + '?action=add&key=' + encodeURIComponent(adminKey), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(eventData)
-          });
-        }
-      } catch (err) {
-        showToast('Network error. Event not saved.');
-        return;
-      }
-
-      closeModal('createModal');
-      await fetchEvents();
-      showToast(editId ? 'Event updated.' : 'Event created.');
     }
 
     function openDetail(id) {
@@ -1239,141 +996,18 @@
             </div>
           ` : ''}
         </div>
-        <div class="modal-actions" style="margin-top:24px;">
-          ${adminMode ? `<button class="btn btn-primary btn-sm" onclick="editEvent('${ev.id}')">Edit Event</button>` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="closeModal('detailModal')">Close</button>
-        </div>
-        ${adminMode ? `<button class="delete-btn" onclick="confirmDeleteEvent('${ev.id}')">Delete Event</button>` : ''}
-        ${adminMode ? `<div id="deleteConfirm" class="delete-confirm-bar" style="display:none;">
-          <span>Are you sure? This cannot be undone.</span>
-          <button class="delete-btn" onclick="executeDeleteEvent()" style="margin-top:0;margin-left:auto;background:rgba(239,68,68,.25);border-color:#ef4444;">Yes, Delete</button>
-          <button class="delete-btn" onclick="cancelDeleteEvent()" style="margin-top:0;margin-left:8px;border-color:rgba(255,255,255,.2);color:var(--muted);background:transparent;">Cancel</button>
-        </div>` : ''}
-      `;
+         <div class="modal-actions" style="margin-top:24px;">
+           <button class="btn btn-secondary btn-sm" onclick="closeModal('detailModal')">Close</button>
+         </div>
+       `;
 
       openModal('detailModal');
     }
 
-    function editEvent(id) {
-      const ev = allEvents.find(e => e.id === id);
-      if (!ev || !adminMode) return;
-
-      closeModal('detailModal');
-
-      document.getElementById('editId').value = ev.id;
-      document.getElementById('evTitle').value = ev.title;
-      document.getElementById('evDate').value = ev.date;
-      document.getElementById('evTime').value = ev.time || '';
-      document.getElementById('evCategory').value = ev.category;
-      document.getElementById('evLocation').value = ev.location || '';
-      document.getElementById('evDesc').value = ev.description || '';
-      document.getElementById('evEnd').value = ev.endDate || '';
-      document.getElementById('formSubmitBtn').textContent = 'Update Event';
-
-      openModal('createModal');
-    }
-
-    let pendingDeleteId = null;
-
-    function confirmDeleteEvent(id) {
-      pendingDeleteId = id;
-      document.getElementById('deleteConfirm').style.display = 'flex';
-    }
-
-    function cancelDeleteEvent() {
-      pendingDeleteId = null;
-      document.getElementById('deleteConfirm').style.display = 'none';
-    }
-
-    async function executeDeleteEvent() {
-      if (!pendingDeleteId) return;
-      const id = pendingDeleteId;
-      pendingDeleteId = null;
-      document.getElementById('deleteConfirm').style.display = 'none';
-      try {
-        await fetch(API_BASE + '?action=delete&key=' + encodeURIComponent(adminKey), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        });
-      } catch (err) {
-        showToast('Network error. Event not deleted.');
-        return;
-      }
-      closeModal('detailModal');
-      await fetchEvents();
-      showToast('Event deleted.');
-    }
-
-    // ADMIN MODE
-    function toggleAdminMode() {
-      if (adminMode) {
-        adminMode = false;
-        document.body.classList.remove('admin-mode');
-        showToast('Admin mode OFF');
-        render();
-        return;
-      }
-      if (adminKey) {
-        adminMode = true;
-        document.body.classList.add('admin-mode');
-        showToast('Admin mode ON');
-        render();
-        return;
-      }
-      document.getElementById('adminKeyOverlay').classList.add('open');
-      document.getElementById('adminKeyInput').focus();
-    }
-
-    async function submitAdminKey() {
-      const key = document.getElementById('adminKeyInput').value.trim();
-      if (!key) return;
-      document.getElementById('adminKeyError').textContent = '';
-      try {
-        const res = await fetch(API_BASE + '?action=list&key=' + encodeURIComponent(key));
-        if (res.ok) {
-          adminKey = key;
-          sessionStorage.setItem('llr-admin-key', key);
-          adminMode = true;
-          document.body.classList.add('admin-mode');
-          document.getElementById('adminKeyOverlay').classList.remove('open');
-          document.getElementById('adminKeyInput').value = '';
-          showToast('Admin mode ON');
-          render();
-        } else {
-          document.getElementById('adminKeyError').textContent = 'Invalid key.';
-        }
-      } catch (err) {
-        document.getElementById('adminKeyError').textContent = 'Network error.';
-      }
-    }
-
-    function closeAdminKey() {
-      document.getElementById('adminKeyOverlay').classList.remove('open');
-      document.getElementById('adminKeyInput').value = '';
-      document.getElementById('adminKeyError').textContent = '';
-    }
-
-    // KEYBOARD SHORTCUTS
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
-        if (document.getElementById('adminKeyOverlay').classList.contains('open')) {
-          closeAdminKey();
-        } else {
-          document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
-        }
+        document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
       }
-      if (e.key === 'a' || e.key === 'A') {
-        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) return;
-        if (document.getElementById('adminKeyOverlay').classList.contains('open')) return;
-        if (document.querySelector('.modal-overlay.open')) return;
-        toggleAdminMode();
-      }
-    });
-
-    document.getElementById('adminKeyInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') submitAdminKey();
-      if (e.key === 'Escape') closeAdminKey();
     });
 
     init();

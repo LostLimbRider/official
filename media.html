@@ -783,15 +783,164 @@
     }
     .delete-confirm-bar.show { display: flex; }
 
-    @media (max-width: 940px) {
-      .nav { position: static; align-items: flex-start; flex-direction: column; }
-      .nav-links { flex-wrap: wrap; }
-      .featured-player { grid-template-columns: 1fr; }
-      .featured-art { max-width: 300px; margin: 0 auto; }
-      .subscribe-banner { grid-template-columns: 1fr; }
-      .video-grid { grid-template-columns: 1fr; }
-      .episodes-grid { grid-template-columns: 1fr; }
-    }
+     /* LIVE STREAM */
+     .live-stream-section { margin-bottom: 40px; }
+     .live-frame {
+       position: relative;
+       border-radius: 24px;
+       overflow: hidden;
+       border: 1px solid var(--line);
+       background: linear-gradient(145deg, rgba(28,28,28,.92), rgba(9,9,9,.92));
+       box-shadow: var(--shadow);
+     }
+     .live-frame iframe {
+       width: 100%;
+       height: 500px;
+       border: 0;
+       display: block;
+     }
+     .live-overlay {
+       position: absolute;
+       top: 0;
+       left: 0;
+       right: 0;
+       height: 64px;
+       background: rgba(0,0,0,.65);
+       backdrop-filter: blur(8px);
+       display: flex;
+       align-items: center;
+       gap: 12px;
+       padding: 0 20px;
+       z-index: 2;
+     }
+     .live-dot {
+       width: 14px;
+       height: 14px;
+       border-radius: 50%;
+       background: #ef4444;
+       box-shadow: 0 0 0 0 rgba(239,68,68,.7);
+       animation: pulse 1.4s ease-in-out infinite;
+       flex-shrink: 0;
+     }
+     @keyframes pulse {
+       0% { box-shadow: 0 0 0 0 rgba(239,68,68,.6); }
+       70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+       100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+     }
+     .live-overlay .status-text {
+       font-size: 13px;
+       font-weight: 900;
+       text-transform: uppercase;
+       letter-spacing: .1em;
+     }
+     .live-overlay .status-text.live-now { color: #fca5a5; }
+     .live-overlay .status-text.scheduled { color: #fcd34d; }
+     .live-overlay .status-text.offline { color: var(--muted); }
+     .live-overlay .viewer-count {
+       margin-left: auto;
+       font-size: 13px;
+       color: var(--muted);
+       font-weight: 700;
+     }
+     .live-placeholder {
+       width: 100%;
+       height: 400px;
+       border-radius: 20px;
+       border: 1px dashed var(--line);
+       background: rgba(255,255,255,.02);
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+       gap: 14px;
+       color: var(--muted);
+       text-align: center;
+       padding: 20px;
+     }
+     .live-placeholder .placeholder-icon { font-size: 56px; }
+     .live-placeholder h3 {
+       font-size: clamp(20px, 3vw, 32px);
+       margin: 0;
+       color: var(--white);
+     }
+     .live-placeholder p { font-size: 15px; line-height: 1.6; max-width: 500px; }
+
+     .live-meta {
+       display: flex;
+       align-items: center;
+       gap: 14px;
+       margin-bottom: 20px;
+     }
+     .live-meta .live-badge {
+       display: inline-flex;
+       align-items: center;
+       gap: 6px;
+       padding: 6px 14px;
+       border-radius: 999px;
+       font-size: 12px;
+       font-weight: 900;
+       text-transform: uppercase;
+       letter-spacing: .08em;
+     }
+     .live-badge.live { background: rgba(239,68,68,.15); color: #fca5a5; }
+     .live-badge.offline { background: rgba(183,183,183,.12); color: var(--muted); }
+     .live-meta .live-title {
+       font-size: clamp(20px, 2.5vw, 30px);
+       font-weight: 800;
+       line-height: 1.1;
+     }
+     .live-meta .live-desc { color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+     .schedule-list {
+       display: flex;
+       flex-direction: column;
+       gap: 12px;
+     }
+     .schedule-item {
+       display: flex;
+       align-items: center;
+       gap: 14px;
+       padding: 16px 18px;
+       border: 1px solid var(--line);
+       border-radius: 14px;
+       background: linear-gradient(145deg, rgba(28,28,28,.6), rgba(9,9,9,.6));
+       transition: all .2s;
+     }
+     .schedule-item:hover {
+       border-color: rgba(255,106,0,.35);
+       background: linear-gradient(145deg, rgba(35,35,35,.7), rgba(14,14,14,.7));
+     }
+     .schedule-item .schedule-day {
+       font-size: 20px;
+       font-weight: 900;
+       color: var(--orange);
+       min-width: 110px;
+       flex-shrink: 0;
+     }
+     .schedule-item .schedule-time {
+       font-size: 15px;
+       font-weight: 700;
+       color: var(--white);
+       min-width: 80px;
+       flex-shrink: 0;
+     }
+     .schedule-item .schedule-info { flex: 1; min-width: 0; }
+     .schedule-item .schedule-info h4 { font-size: 15px; font-weight: 700; margin: 0 0 2px; }
+     .schedule-item .schedule-info p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.4; }
+
+     @media (max-width: 940px) {
+       .nav { position: static; align-items: flex-start; flex-direction: column; }
+       .nav-links { flex-wrap: wrap; }
+       .featured-player { grid-template-columns: 1fr; }
+       .featured-art { max-width: 300px; margin: 0 auto; }
+       .subscribe-banner { grid-template-columns: 1fr; }
+       .video-grid { grid-template-columns: 1fr; }
+       .episodes-grid { grid-template-columns: 1fr; }
+       .live-frame iframe { height: 360px; }
+       .live-placeholder { height: 300px; }
+       .live-meta { flex-direction: column; align-items: flex-start; gap: 10px; }
+       .schedule-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+     }
 
     @media (max-width: 560px) {
       .brand { min-width: 0; }
@@ -836,6 +985,40 @@
   </header>
 
   <main>
+    <!-- LIVE STREAM -->
+    <section class="live-stream-section">
+      <div class="wrap">
+        <div class="section-heading">
+          <h2 class="section-title">Live <span class="orange">Stream</span></h2>
+          <p style="color:var(--muted); font-size:18px; line-height:1.5;">Watch us ride, record podcasts, and connect in real time. Check the schedule below for upcoming broadcasts.</p>
+        </div>
+
+        <div class="live-meta" id="liveMeta">
+          <span class="live-badge offline" id="liveBadge">Offline</span>
+          <h2 class="live-title" id="liveTitle">Lost Limb Riders Live</h2>
+          <button class="btn btn-ghost btn-sm admin-only" onclick="openStreamModal()" style="margin-left:auto;">Stream Settings</button>
+        </div>
+        <p class="live-desc" id="liveDesc" style="margin-bottom:20px; color:var(--muted); font-size:15px; line-height:1.6;"></p>
+
+        <div id="livePlayerWrapper">
+          <div class="live-frame" id="liveFrame">
+            <div class="live-placeholder" id="livePlaceholder">
+              <div class="placeholder-icon">&#127911;</div>
+              <h3>Live Streams Coming Soon</h3>
+              <p>We stream weekly rides, podcast recordings, and community events. Check back during scheduled times or subscribe to get notified when we go live.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-heading" style="margin-top:40px;">
+          <h2 class="section-title">Upcoming <span class="orange">Schedule</span></h2>
+          <p style="color:var(--muted); font-size:18px; line-height:1.5;">Regular and special broadcasts. All times are Fort Dodge local (Central Time).</p>
+        </div>
+
+        <div class="schedule-list" id="scheduleList"></div>
+      </div>
+    </section>
+
     <!-- FEATURED -->
     <section style="padding-bottom:40px;">
       <div class="wrap">
@@ -928,30 +1111,30 @@
           <h2 class="section-title" style="text-align:center;">Never Miss an <span class="orange">Episode</span></h2>
           <p style="color:var(--muted); font-size:18px; line-height:1.5; max-width:600px; margin:0 auto;">Subscribe on your favorite platform and get new episodes the moment they drop.</p>
         </div>
-
         <div class="subscribe-banner">
-          <a class="sub-card" href="#" target="_blank" rel="noopener">
+          <a class="sub-card" href="https://open.spotify.com/show/" target="_blank" rel="noopener">
             <div class="sub-icon spotify">&#9835;</div>
             <div class="sub-info">
               <h3>Spotify</h3>
               <p>Stream every episode on Spotify</p>
             </div>
           </a>
-          <a class="sub-card" href="#" target="_blank" rel="noopener">
+          <a class="sub-card" href="https://www.youtube.com/@lostlimbriders" target="_blank" rel="noopener">
             <div class="sub-icon youtube">&#9654;</div>
             <div class="sub-info">
               <h3>YouTube</h3>
               <p>Watch vlogs and video podcasts</p>
             </div>
           </a>
-          <a class="sub-card" href="#" target="_blank" rel="noopener">
+          <a class="sub-card" href="https://podcasts.apple.com/us/podcast/" target="_blank" rel="noopener">
             <div class="sub-icon apple">&#9835;</div>
             <div class="sub-info">
               <h3>Apple Podcasts</h3>
               <p>Listen and subscribe on Apple</p>
             </div>
           </a>
-          <a class="sub-card" href="#" target="_blank" rel="noopener">
+
+          <a class="sub-card" href="/api/podcast-rss" target="_blank" rel="noopener">
             <div class="sub-icon rss">&#8942;</div>
             <div class="sub-info">
               <h3>RSS Feed</h3>
@@ -1064,11 +1247,59 @@
     </div>
   </div>
 
+  <!-- STREAM MODAL -->
+  <div class="overlay" id="streamModal">
+    <div class="media-modal">
+      <h3 id="streamModalTitle">Live Stream Settings</h3>
+      <form id="streamForm" onsubmit="saveStream(event)">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Platform</label>
+            <select id="smPlatform">
+              <option value="youtube">YouTube Live</option>
+              <option value="twitch">Twitch</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Status</label>
+            <select id="smStatus">
+              <option value="offline">Offline</option>
+              <option value="live">Live</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Stream ID (YouTube video ID or Twitch channel name)</label>
+          <input id="smStreamId" maxlength="200" placeholder="e.g. dQw4w9WgXcQ or lostlimbriders">
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Title</label>
+          <input id="smTitle" maxlength="200" placeholder="e.g. Live from the Fall Rally">
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Description</label>
+          <textarea id="smDesc" maxlength="2000" placeholder="What are you streaming?"></textarea>
+        </div>
+        <div class="form-field" style="margin-bottom:14px;">
+          <label>Viewer Count (for display)</label>
+          <input id="smViewers" type="number" min="0" placeholder="e.g. 42">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeStreamModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
     const API_BASE = '/api/media';
+    const STREAM_API = '/api/stream';
     let media = [];
+    let streamConfig = null;
+    let streamPoll = null;
     let adminMode = false;
     let adminKey = sessionStorage.getItem('llr-admin-key') || '';
     let playing = false;
@@ -1113,6 +1344,146 @@
       renderPodcasts();
       renderVlogs();
       renderCoffeeTalk();
+    }
+
+    async function fetchStream() {
+      try {
+        const res = await fetch(STREAM_API + '?action=get');
+        const data = await res.json();
+        if (data.stream) {
+          streamConfig = data.stream;
+          renderLiveStream();
+        }
+      } catch (e) {
+        streamConfig = null;
+      }
+    }
+
+    function getStreamEmbedUrl() {
+      if (!streamConfig || !streamConfig.streamId) return null;
+      const id = encodeURIComponent(streamConfig.streamId);
+      if (streamConfig.platform === 'twitch') {
+        return `https://player.twitch.tv/?channel=${id}&parent=lostlimbriders.org&autoplay=false`;
+      }
+      return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1`;
+    }
+
+    function renderLiveStream() {
+      const badge = document.getElementById('liveBadge');
+      const title = document.getElementById('liveTitle');
+      const desc = document.getElementById('liveDesc');
+      const wrapper = document.getElementById('livePlayerWrapper');
+      const meta = document.getElementById('liveMeta');
+
+      const status = streamConfig.status || 'offline';
+      const isLive = status === 'live';
+
+      badge.className = 'live-badge ' + (isLive ? 'live' : 'offline');
+      badge.textContent = isLive ? 'Live Now' : 'Offline';
+      badge.classList.remove('live-now', 'scheduled', 'offline');
+      if (isLive) badge.classList.add('live-now');
+      else badge.classList.add('offline');
+
+      title.textContent = streamConfig.title || 'Lost Limb Riders Live';
+      desc.textContent = streamConfig.description || '';
+
+      const embedUrl = getStreamEmbedUrl();
+      if (isLive && embedUrl) {
+        wrapper.innerHTML = '<div class="live-frame"><iframe src="' + embedUrl + '" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>';
+        if (streamConfig.viewerCount) {
+          const viewers = document.createElement('span');
+          viewers.className = 'viewer-count';
+          viewers.innerHTML = '&#128266; ' + streamConfig.viewerCount + ' watching';
+          meta.appendChild(viewers);
+        }
+      } else {
+        wrapper.innerHTML = '<div class="live-placeholder"><div class="placeholder-icon">&#127911;</div><h3>Live Streams Coming Soon</h3><p>We stream weekly rides, podcast recordings, and community events. Check back during scheduled times or subscribe to get notified when we go live.</p></div>';
+        meta.querySelectorAll('.viewer-count').forEach(el => el.remove());
+      }
+
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      const grid = document.getElementById('scheduleList');
+      if (!streamConfig || !streamConfig.schedule || !streamConfig.schedule.length) {
+        grid.innerHTML = '<p style="color:var(--muted);">No scheduled streams yet.</p>';
+        return;
+      }
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const today = new Date();
+      const currentDay = today.getDay();
+      const currentHour = today.getHours();
+      const todayStart = new Date(today);
+      todayStart.setHours(0, 0, 0, 0);
+      grid.innerHTML = streamConfig.schedule.map(item => {
+        const isRecurring = item.recurring !== false;
+        const label = item.day || (item.date ? new Date(item.date).toLocaleDateString() : 'TBD');
+        let upcoming = false;
+        if (isRecurring) {
+          const dayIdx = days.indexOf(item.day);
+          if (dayIdx !== -1) upcoming = dayIdx === currentDay && (parseInt(item.time) <= currentHour + 3);
+        } else if (item.date) {
+          const d = new Date(item.date);
+          upcoming = d >= todayStart;
+        }
+        return '<div class="schedule-item">' +
+          '<div class="schedule-day">' + escapeHtml(label) + '</div>' +
+          '<div class="schedule-time">' + escapeHtml(item.time || '') + '</div>' +
+          '<div class="schedule-info">' +
+            '<h4>' + escapeHtml(item.title || '') + '</h4>' +
+            '<p>' + escapeHtml(item.description || '') + '</p>' +
+          '</div>' +
+          (upcoming ? '<span class="live-badge live" style="margin-left:auto; font-size:10px; padding:4px 10px;">Upcoming</span>' : '') +
+        '</div>';
+      }).join('');
+    }
+
+    function openStreamModal() {
+      if (!adminMode) return;
+      if (!streamConfig) return;
+      document.getElementById('smPlatform').value = streamConfig.platform || 'youtube';
+      document.getElementById('smStreamId').value = streamConfig.streamId || '';
+      document.getElementById('smTitle').value = streamConfig.title || '';
+      document.getElementById('smDesc').value = streamConfig.description || '';
+      document.getElementById('smStatus').value = streamConfig.status || 'offline';
+      document.getElementById('smViewers').value = streamConfig.viewerCount || 0;
+      document.getElementById('streamModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeStreamModal() {
+      document.getElementById('streamModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function saveStream(e) {
+      e.preventDefault();
+      const payload = {
+        platform: document.getElementById('smPlatform').value,
+        streamId: document.getElementById('smStreamId').value.trim(),
+        title: document.getElementById('smTitle').value.trim(),
+        description: document.getElementById('smDesc').value.trim(),
+        status: document.getElementById('smStatus').value,
+        viewerCount: parseInt(document.getElementById('smViewers').value, 10) || 0,
+      };
+      try {
+        const res = await fetch(STREAM_API + '?action=update&key=' + encodeURIComponent(adminKey), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          showToast(data.error || 'Save failed.');
+          return;
+        }
+        closeStreamModal();
+        await fetchStream();
+        showToast('Stream settings updated.');
+      } catch (err) {
+        showToast('Network error.');
+      }
     }
 
     function loadFeatured() {
@@ -1474,8 +1845,9 @@
       if (adminKey) {
         adminMode = true;
         document.body.classList.add('admin-mode');
-        showToast('Admin mode ON');
-        fetchMedia();
+          showToast('Admin mode ON');
+          fetchMedia();
+          fetchStream();
         return;
       }
       document.getElementById('adminKeyOverlay').classList.add('open');
@@ -1496,7 +1868,9 @@
           document.getElementById('adminKeyOverlay').classList.remove('open');
           document.getElementById('adminKeyInput').value = '';
           showToast('Admin mode ON');
-          fetchMedia();
+    fetchMedia();
+    fetchStream();
+    streamPoll = setInterval(fetchStream, 30000);
         } else {
           document.getElementById('adminKeyError').textContent = 'Invalid key.';
         }
@@ -1518,6 +1892,8 @@
           closeAdminKey();
         } else if (document.getElementById('episodeModal').classList.contains('open')) {
           closeEpisodeModal();
+        } else if (document.getElementById('streamModal').classList.contains('open')) {
+          closeStreamModal();
         } else {
           closeVideoModal();
         }

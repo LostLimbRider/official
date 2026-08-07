@@ -215,6 +215,12 @@
     .badge-hosting { background: rgba(245,158,11,.2); color: #f59e0b; }
     .badge-clean { background: rgba(34,197,94,.15); color: #22c55e; }
 
+    .cat-ride { background: rgba(34,197,94,.15); color: #22c55e; }
+    .cat-fundraiser { background: rgba(245,158,11,.15); color: #f59e0b; }
+    .cat-community { background: rgba(59,130,246,.15); color: #3b82f6; }
+    .cat-meeting { background: rgba(168,85,247,.15); color: #a855f7; }
+    .cat-rally { background: rgba(239,68,68,.15); color: #ef4444; }
+
     .pagination {
       display: flex;
       gap: 8px;
@@ -281,6 +287,14 @@
       background: #ef4444;
       color: var(--white);
     }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover { background: rgba(255,255,255,.12); color: var(--white); }
 
     .btn-sm {
       padding: 6px 16px;
@@ -396,6 +410,41 @@
       margin-bottom: 4px;
     }
 
+    /* Forms / modals */
+    .media-modal {
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(28,28,28,.98), rgba(9,9,9,.98));
+      box-shadow: 0 40px 100px rgba(0,0,0,.6);
+      position: relative;
+    }
+    .media-modal h3 { margin: 0 0 20px; font-size: 22px; text-transform: uppercase; letter-spacing: -.02em; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-field { display: flex; flex-direction: column; }
+    .form-field label { display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,.05);
+      color: var(--white);
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--orange); }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .form-field select option { background: #111; }
+    .form-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .form-actions .btn { justify-content: center; }
+
     @media (max-width: 768px) {
       section { padding: 24px 5vw; }
       .panel { padding: 20px; }
@@ -475,6 +524,8 @@
         <button class="tab-btn active" onclick="switchTab('subscribers')">Subscribers</button>
         <button class="tab-btn" onclick="switchTab('visitors')">Visitor Log</button>
         <button class="tab-btn" onclick="switchTab('newsletter')">Send Newsletter</button>
+        <button class="tab-btn" onclick="switchTab('stream')">Live Stream</button>
+        <button class="tab-btn" onclick="switchTab('events')">Events</button>
       </div>
 
       <!-- Subscribers panel -->
@@ -527,31 +578,214 @@
       </div>
 
       <!-- Newsletter panel -->
-      <div id="panel-newsletter" class="tab-panel">
-        <div class="panel" style="margin-bottom:20px;">
-          <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Compose Newsletter</h3>
-          <p style="color:var(--muted); font-size:13px; margin-bottom:12px;">
-            Write a custom intro message. Upcoming events are auto-populated from the calendar. Preview before sending.
-          </p>
-          <textarea id="nlMessage" placeholder="Optional custom message to include at the top of the newsletter..."></textarea>
-          <div style="display:flex; gap:12px; flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="previewNewsletter()">Preview</button>
-            <button class="btn btn-danger" onclick="confirmSendNewsletter()">Send to All Subscribers</button>
-          </div>
-          <div id="sendConfirm" style="display:none;margin-top:12px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:#fff;font-size:13px;font-weight:700;align-items:center;gap:12px;">
-            <span>Send newsletter to ALL subscribers?</span>
-            <button class="btn btn-danger btn-sm" onclick="sendNewsletter()" style="margin-left:auto;">Yes, Send</button>
-            <button class="btn btn-sm" onclick="cancelSendNewsletter()" style="background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.2);">Cancel</button>
-          </div>
-          <div id="nlSendStatus" style="margin-top:12px; font-size:13px; min-height:20px;"></div>
-        </div>
-        <div id="nlPreview" style="display:none;">
-          <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Preview</h3>
-          <div id="nlPreviewContent"></div>
-        </div>
-      </div>
+       <div id="panel-newsletter" class="tab-panel">
+         <div class="panel" style="margin-bottom:20px;">
+           <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Compose Newsletter</h3>
+           <p style="color:var(--muted); font-size:13px; margin-bottom:12px;">
+             Write a custom intro message. Upcoming events are auto-populated from the calendar. Preview before sending.
+           </p>
+           <textarea id="nlMessage" placeholder="Optional custom message to include at the top of the newsletter..."></textarea>
+           <div style="display:flex; gap:12px; flex-wrap:wrap;">
+             <button class="btn btn-primary" onclick="previewNewsletter()">Preview</button>
+             <button class="btn btn-danger" onclick="confirmSendNewsletter()">Send to All Subscribers</button>
+           </div>
+           <div id="sendConfirm" style="display:none;margin-top:12px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:#fff;font-size:13px;font-weight:700;align-items:center;gap:12px;">
+             <span>Send newsletter to ALL subscribers?</span>
+             <button class="btn btn-danger btn-sm" onclick="sendNewsletter()" style="margin-left:auto;">Yes, Send</button>
+             <button class="btn btn-sm" onclick="cancelSendNewsletter()" style="background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.2);">Cancel</button>
+           </div>
+           <div id="nlSendStatus" style="margin-top:12px; font-size:13px; min-height:20px;"></div>
+         </div>
+         <div id="nlPreview" style="display:none;">
+           <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Preview</h3>
+           <div id="nlPreviewContent"></div>
+         </div>
+       </div>
 
-    </div>
+       <!-- Live Stream panel -->
+       <div id="panel-stream" class="tab-panel">
+         <div class="panel">
+           <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px;">Stream Configuration</h3>
+           <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">Manage your live stream settings. When status is set to "live", the media page will show the embedded player.</p>
+
+           <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+             <div>
+               <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Platform</label>
+               <select id="smPlatform" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px; font-family:inherit;">
+                 <option value="youtube">YouTube Live</option>
+                 <option value="twitch">Twitch</option>
+               </select>
+             </div>
+             <div>
+               <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Status</label>
+               <select id="smStatus" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px; font-family:inherit;">
+                 <option value="offline">Offline</option>
+                 <option value="live">Live</option>
+               </select>
+             </div>
+           </div>
+
+           <div style="margin-bottom:14px;">
+             <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Stream ID (YouTube video ID or Twitch channel name)</label>
+             <input id="smStreamId" maxlength="200" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="e.g. dQw4w9WgXcQ or lostlimbriders">
+           </div>
+
+           <div style="margin-bottom:14px;">
+             <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Title</label>
+             <input id="smTitle" maxlength="200" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="e.g. Live from the Fall Rally">
+           </div>
+
+           <div style="margin-bottom:14px;">
+             <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Description</label>
+             <textarea id="smDesc" maxlength="2000" style="width:100%; min-height:80px; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px; font-family:inherit; resize:vertical;" placeholder="What are you streaming?"></textarea>
+           </div>
+
+           <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+             <div>
+               <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Viewer Count</label>
+               <input id="smViewers" type="number" min="0" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="0">
+             </div>
+           </div>
+
+           <div style="margin-bottom:20px;">
+             <h4 style="color:var(--white); font-size:14px; font-weight:800; margin:0 0 12px;">Scheduled Streams</h4>
+             <div id="scheduleListAdmin" style="display:flex; flex-direction:column; gap:10px; margin-bottom:12px;"></div>
+             <button class="btn btn-sm" style="width:100%; justify-content:center;" onclick="openScheduleModal()">+ Add Scheduled Stream</button>
+           </div>
+
+           <div style="display:flex; gap:12px;">
+             <button class="btn btn-primary" onclick="saveStreamConfig()" style="flex:1; justify-content:center;">Save</button>
+             <button class="btn" style="background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.2);flex:1; justify-content:center;" onclick="goLive()">Go Live Now</button>
+           </div>
+           <div id="streamSaveStatus" style="margin-top:12px; font-size:13px; min-height:18px;"></div>
+         </div>
+       </div>
+
+       <!-- Schedule item modal -->
+       <div id="scheduleModal" style="display:none; position:fixed; inset:0; z-index:999; background:rgba(0,0,0,.75); backdrop-filter:blur(10px); align-items:center; justify-content:center; padding:20px;">
+         <div class="media-modal">
+           <h3>Add Scheduled Stream</h3>
+           <div class="form-field" style="margin-bottom:14px;">
+             <label>Title</label>
+             <input id="schTitle" maxlength="200" placeholder="e.g. Weekly Wednesday Ride">
+           </div>
+           <div class="form-row">
+             <div class="form-field">
+               <label>Day</label>
+               <select id="schDay">
+                 <option value="Sunday">Sunday</option>
+                 <option value="Monday">Monday</option>
+               <option value="Tuesday">Tuesday</option>
+                 <option value="Wednesday">Wednesday</option>
+                 <option value="Thursday">Thursday</option>
+                 <option value="Friday">Friday</option>
+                 <option value="Saturday">Saturday</option>
+               </select>
+             </div>
+             <div class="form-field">
+               <label>Time</label>
+               <input id="schTime" maxlength="10" placeholder="e.g. 09:00">
+             </div>
+           </div>
+           <div class="form-row">
+             <div class="form-field">
+               <label>Date (specific, or leave blank for recurring)</label>
+               <input id="schDate" maxlength="10" placeholder="e.g. 2026-10-03">
+             </div>
+             <div class="form-field">
+               <label>Recurring</label>
+               <select id="schRecurring">
+                 <option value="true">Yes</option>
+                 <option value="false">No (one-time)</option>
+               </select>
+             </div>
+           </div>
+           <div class="form-field" style="margin-bottom:14px;">
+             <label>Description</label>
+             <textarea id="schDesc" maxlength="2000" placeholder="What is this stream about?"></textarea>
+           </div>
+           <div class="form-actions">
+             <button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+             <button type="submit" class="btn btn-primary" onclick="saveScheduledItem()">Add</button>
+           </div>
+         </div>
+        </div>
+
+        <!-- Events panel -->
+        <div id="panel-events" class="tab-panel">
+          <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin:0;">Calendar Events</h3>
+              <button class="btn btn-sm btn-primary" style="white-space:nowrap;" onclick="openEventForm()">+ Add Event</button>
+            </div>
+
+            <div id="eventFormWrap" style="display:none;">
+              <input type="hidden" id="evEditId" value="">
+              <div class="form-field">
+                <label>Event Name</label>
+                <input id="evTitle" maxlength="200" placeholder="e.g. Freedom Ride 2026">
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Date</label>
+                  <input id="evDate" type="date">
+                </div>
+                <div class="form-field">
+                  <label>Time</label>
+                  <input id="evTime" type="time">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Category</label>
+                  <select id="evCategory">
+                    <option value="ride">Ride</option>
+                    <option value="fundraiser">Fundraiser</option>
+                    <option value="community">Community</option>
+                    <option value="meeting">Meeting</option>
+                    <option value="rally">Rally</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Location</label>
+                  <input id="evLocation" maxlength="200" placeholder="e.g. Fort Dodge, IA">
+                </div>
+              </div>
+              <div class="form-field">
+                <label>End Date (optional, for multi-day)</label>
+                <input id="evEnd" type="date">
+              </div>
+              <div class="form-field">
+                <label>Description</label>
+                <textarea id="evDesc" maxlength="2000" placeholder="Details about the event..."></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" onclick="saveEvent()">Save</button>
+                <button class="btn btn-secondary" onclick="cancelEventForm()">Cancel</button>
+              </div>
+              <div id="evSaveStatus" style="margin-top:12px; font-size:13px; min-height:18px;"></div>
+            </div>
+
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Time</th>
+                    <th style="text-align:right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="evBody"></tbody>
+              </table>
+            </div>
+            <div id="evEmpty" class="empty-state" style="display:none;">No events yet.</div>
+          </div>
+        </div>
+
+     </div>
   </section>
 
   <footer style="padding:32px 7vw; text-align:center; color:#555; font-size:12px;">
@@ -599,15 +833,17 @@
     }
 
     // --- Tabs ---
-    function switchTab(name) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('panel-' + name).classList.add('active');
+      function switchTab(name) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('panel-' + name).classList.add('active');
 
-      if (name === 'subscribers') loadSubscribers();
-      if (name === 'visitors') loadVisitors(1);
-    }
+        if (name === 'subscribers') loadSubscribers();
+        if (name === 'visitors') loadVisitors(1);
+        if (name === 'stream') loadStreamConfig();
+        if (name === 'events') loadEvents();
+      }
 
     // --- Charts ---
     function renderBarChart(containerId, emptyId, data, maxVal) {
@@ -757,10 +993,299 @@
       } catch {
         status.textContent = 'Connection error.';
       }
-    }
+     }
 
-    // --- Utilities ---
-    function escapeHtml(str) {
+     // --- Live Stream ---
+     async function loadStreamConfig() {
+       const status = document.getElementById('streamSaveStatus');
+       status.textContent = 'Loading...';
+       try {
+         const res = await fetch(apiUrl('stream'));
+         if (!res.ok) return;
+         const data = await res.json();
+         const stream = data.stream || {};
+         document.getElementById('smPlatform').value = stream.platform || 'youtube';
+         document.getElementById('smStreamId').value = stream.streamId || '';
+         document.getElementById('smTitle').value = stream.title || '';
+         document.getElementById('smDesc').value = stream.description || '';
+         document.getElementById('smStatus').value = stream.status || 'offline';
+         document.getElementById('smViewers').value = stream.viewerCount || 0;
+         renderScheduleAdmin(stream.schedule || []);
+         status.textContent = '';
+       } catch {
+         status.textContent = 'Connection error.';
+       }
+     }
+
+     function renderScheduleAdmin(schedule) {
+       const list = document.getElementById('scheduleListAdmin');
+       if (!schedule.length) {
+         list.innerHTML = '<p style="color:var(--muted); font-size:13px; text-align:center; padding:16px;">No scheduled streams yet.</p>';
+         return;
+       }
+       list.innerHTML = schedule.map(item => {
+         const recurring = item.recurring !== false ? ' (recurring)' : '';
+         return '<div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.03);">' +
+           '<div style="flex:1; min-width:0;">' +
+             '<div style="font-size:14px; font-weight:700; color:var(--white); margin-bottom:2px;">' + escapeHtml(item.title || '') + '</div>' +
+             '<div style="font-size:12px; color:var(--muted);">' + escapeHtml(item.day || '') + ' ' + escapeHtml(item.time || '') + (item.date ? ' \u2022 ' + escapeHtml(item.date) : '') + recurring + '</div>' +
+           '</div>' +
+           '<button class="btn btn-sm" style="margin-left:12px; background:transparent; color:#ef4444; border-color:rgba(239,68,68,.3);" onclick="deleteScheduleItem(\'' + item.id + '\')">Delete</button>' +
+         '</div>';
+       }).join('');
+     }
+
+     async function saveStreamConfig() {
+       const status = document.getElementById('streamSaveStatus');
+       status.textContent = 'Saving...';
+       try {
+         const res = await fetch(apiUrl('update-stream'), {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             platform: document.getElementById('smPlatform').value,
+             streamId: document.getElementById('smStreamId').value.trim(),
+             title: document.getElementById('smTitle').value.trim(),
+             description: document.getElementById('smDesc').value.trim(),
+             status: document.getElementById('smStatus').value,
+             viewerCount: parseInt(document.getElementById('smViewers').value, 10) || 0,
+           })
+         });
+         if (!res.ok) { status.textContent = 'Save failed.'; return; }
+         status.textContent = 'Saved!';
+         setTimeout(() => status.textContent = '', 2000);
+       } catch {
+         status.textContent = 'Connection error.';
+       }
+     }
+
+     async function goLive() {
+       document.getElementById('smStatus').value = 'live';
+       await saveStreamConfig();
+     }
+
+     function openScheduleModal() {
+       document.getElementById('scheduleModal').style.display = 'flex';
+       document.getElementById('scheduleModal').querySelector('input, select, textarea').focus();
+     }
+
+     function closeScheduleModal() {
+       document.getElementById('scheduleModal').style.display = 'none';
+       document.getElementById('schTitle').value = '';
+       document.getElementById('schTime').value = '';
+       document.getElementById('schDate').value = '';
+       document.getElementById('schDesc').value = '';
+       document.getElementById('schDay').value = 'Wednesday';
+       document.getElementById('schRecurring').value = 'true';
+     }
+
+     async function saveScheduledItem() {
+       const title = document.getElementById('schTitle').value.trim();
+       if (!title) return;
+       const item = {
+         id: 'ls-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8),
+         title: title,
+         day: document.getElementById('schDay').value,
+         time: document.getElementById('schTime').value.trim(),
+         date: document.getElementById('schDate').value.trim(),
+         recurring: document.getElementById('schRecurring').value !== 'false',
+         description: document.getElementById('schDesc').value.trim(),
+       };
+       try {
+         const res = await fetch(apiUrl('stream'));
+         if (!res.ok) return;
+         const data = await res.json();
+         const stream = data.stream || {};
+         const schedule = Array.isArray(stream.schedule) ? stream.schedule : [];
+         schedule.unshift(item);
+         await fetch(apiUrl('update-stream'), {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             platform: stream.platform,
+             streamId: stream.streamId,
+             title: stream.title,
+             description: stream.description,
+             status: stream.status,
+             viewerCount: stream.viewerCount,
+             schedule: schedule,
+           })
+         });
+         closeScheduleModal();
+         loadStreamConfig();
+       } catch {
+         document.getElementById('streamSaveStatus').textContent = 'Error saving schedule.';
+       }
+     }
+
+     async function deleteScheduleItem(id) {
+       if (!confirm('Delete this scheduled stream?')) return;
+       try {
+         const res = await fetch(apiUrl('stream'));
+         if (!res.ok) return;
+         const data = await res.json();
+         const stream = data.stream || {};
+         const schedule = (stream.schedule || []).filter(s => s.id !== id);
+         await fetch(apiUrl('update-stream'), {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             platform: stream.platform,
+             streamId: stream.streamId,
+             title: stream.title,
+             description: stream.description,
+             status: stream.status,
+             viewerCount: stream.viewerCount,
+             schedule: schedule,
+           })
+         });
+         loadStreamConfig();
+       } catch {}
+     }
+
+      function loadAll() {
+        loadStats();
+        loadSubscribers();
+      }
+
+      // --- Events ---
+      function eventsApiUrl(action, extra) {
+        let url = '/api/events?action=' + action + '&key=' + encodeURIComponent(adminKey);
+        if (extra) url += '&' + extra;
+        return url;
+      }
+
+      let allEvents = [];
+
+      async function loadEvents() {
+        try {
+          const res = await fetch(eventsApiUrl('list'));
+          if (!res.ok) return;
+          const data = await res.json();
+          allEvents = Array.isArray(data.events) ? data.events : [];
+          const body = document.getElementById('evBody');
+          const empty = document.getElementById('evEmpty');
+          if (!allEvents.length) { body.innerHTML = ''; empty.style.display = 'block'; return; }
+          empty.style.display = 'none';
+          const catLabel = { ride:'Ride', fundraiser:'Fundraiser', community:'Community', meeting:'Meeting', rally:'Rally' };
+          const catColor = { ride:'cat-ride', fundraiser:'cat-fundraiser', community:'cat-community', meeting:'cat-meeting', rally:'cat-rally' };
+          body.innerHTML = allEvents.map(e => {
+            const cat = e.category || 'community';
+            return '<tr>' +
+              '<td style="white-space:nowrap;">' + formatDate(e.date) + '</td>' +
+              '<td>' + escapeHtml(e.title) + '</td>' +
+              '<td><span class="badge ' + (catColor[cat] || 'cat-community') + '">' + (catLabel[cat] || cat) + '</span></td>' +
+              '<td>' + escapeHtml(e.location || '') + '</td>' +
+              '<td style="white-space:nowrap;">' + (e.time ? formatTime(e.time) : '') + '</td>' +
+              '<td style="text-align:right; white-space:nowrap;">' +
+                '<button class="btn btn-sm" style="padding:4px 10px; margin-right:4px;" onclick="editEvent(\'' + e.id + '\')">Edit</button>' +
+                '<button class="btn btn-danger btn-sm" style="padding:4px 10px;" onclick="deleteEvent(\'' + e.id + '\')">Del</button>' +
+              '</td>' +
+            '</tr>';
+          }).join('');
+        } catch {}
+      }
+
+      function openEventForm() {
+        document.getElementById('evEditId').value = '';
+        document.getElementById('evTitle').value = '';
+        document.getElementById('evDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('evTime').value = '';
+        document.getElementById('evEnd').value = '';
+        document.getElementById('evCategory').value = 'ride';
+        document.getElementById('evLocation').value = '';
+        document.getElementById('evDesc').value = '';
+        document.getElementById('evSaveStatus').textContent = '';
+        document.getElementById('eventFormWrap').style.display = 'block';
+      }
+
+      async function saveEvent() {
+        const editId = document.getElementById('evEditId').value;
+        const eventData = {
+          title: document.getElementById('evTitle').value.trim(),
+          date: document.getElementById('evDate').value,
+          time: document.getElementById('evTime').value,
+          category: document.getElementById('evCategory').value,
+          location: document.getElementById('evLocation').value.trim(),
+          description: document.getElementById('evDesc').value.trim(),
+          endDate: document.getElementById('evEnd').value
+        };
+        const statusEl = document.getElementById('evSaveStatus');
+        if (!eventData.title || !eventData.date) {
+          statusEl.textContent = 'Title and date are required.';
+          return;
+        }
+        statusEl.textContent = 'Saving...';
+        try {
+          const res = await fetch(eventsApiUrl(editId ? 'update' : 'add', 'id=' + encodeURIComponent(editId)), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(editId ? { ...eventData, id: editId } : eventData)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            statusEl.textContent = data.error || 'Save failed.';
+            return;
+          }
+          statusEl.textContent = editId ? 'Event updated.' : 'Event created.';
+          cancelEventForm();
+          loadEvents();
+        } catch {
+          statusEl.textContent = 'Network error.';
+        }
+      }
+
+      function cancelEventForm() {
+        document.getElementById('eventFormWrap').style.display = 'none';
+        document.getElementById('evSaveStatus').textContent = '';
+      }
+
+      function editEvent(id) {
+        const ev = allEvents.find(e => e.id === id);
+        if (!ev) return;
+        document.getElementById('evEditId').value = ev.id;
+        document.getElementById('evTitle').value = ev.title || '';
+        document.getElementById('evDate').value = ev.date || '';
+        document.getElementById('evTime').value = ev.time || '';
+        document.getElementById('evEnd').value = ev.endDate || '';
+        document.getElementById('evCategory').value = ev.category || 'community';
+        document.getElementById('evLocation').value = ev.location || '';
+        document.getElementById('evDesc').value = ev.description || '';
+        document.getElementById('evSaveStatus').textContent = '';
+        document.getElementById('eventFormWrap').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      async function deleteEvent(id) {
+        if (!confirm('Delete this event? This cannot be undone.')) return;
+        try {
+          const res = await fetch(eventsApiUrl('delete'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            alert(data.error || 'Delete failed.');
+            return;
+          }
+          loadEvents();
+        } catch {
+          alert('Network error.');
+        }
+      }
+
+      function formatTime(timeStr) {
+        if (!timeStr) return '';
+        const [h, m] = timeStr.split(':');
+        const hr = parseInt(h);
+        const ampm = hr >= 12 ? 'PM' : 'AM';
+        const hr12 = hr === 0 ? 12 : hr > 12 ? hr - 12 : hr;
+        return hr12 + ':' + m + ' ' + ampm;
+      }
+
+     // --- Utilities ---
+     function escapeHtml(str) {
       const div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;

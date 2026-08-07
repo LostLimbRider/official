@@ -20,6 +20,13 @@ export default function handler(req, res) {
     return;
   }
 
+  if (action === 'validate') {
+    if (isAdmin(req)) {
+      return sendJson(res, { ok: true });
+    }
+    return sendJson(res, { error: 'Invalid admin key.' }, 403);
+  }
+
   if (!isAdmin(req)) {
     return sendJson(res, { error: 'Admin access required.' }, 403);
   }

@@ -1,6 +1,7 @@
-import { getList, KEYS } from '../lib/storage.js';
-import { sendJson, sendEmpty, readBody, isAdmin, getParam } from '../lib/http.js';
+import { getList, setList, KEYS } from '../lib/storage.js';
+import { sendJson, sendEmpty, readBody, isAdmin, clean, getParam } from '../lib/http.js';
 import { buildNewsletter, getUpcomingEvents } from '../lib/newsletter.js';
+import { seedStream } from '../lib/seed.js';
 
 function getBrowserStats(visitors) {
   const stats = { Chrome: 0, Firefox: 0, Safari: 0, Edge: 0, Other: 0 };
@@ -78,6 +79,43 @@ export default function handler(req, res) {
       const upcoming = getUpcomingEvents(events);
       const { html, eventCount } = buildNewsletter(String(payload.message || '').trim(), upcoming);
       sendJson(res, { html, eventCount });
+    }).catch(fail);
+    return;
+  }
+
+  if (action === 'stream') {
+    getList(KEYS.stream).then((arr) => {
+      const stream = arr.length ? arr[0] : seedStream;
+      sendJson(res, { stream });
+    }).catch(fail);
+    return;
+  }
+
+  if (action === 'update-stream' && req.method === 'POST') {
+    readBody(req).then(async (payload) => {
+      const arr = await getList(KEYS.stream);
+      const stream = arr.length ? { ...arr[0] } : { ...seedStream };
+      const FIELDS = [['platform', 20], ['streamId', 200], ['title', 200], ['description', 2000], ['status', 20]];
+      for (const [field, limit] of FIELDS) {
+        if (payload[field] !== undefined) {
+          stream[field] = clean(String(payload[field] ?? ''), limit);
+        }
+      }
+      if (payload.viewerCount !== undefined) stream.viewerCount = parseInt(payload.viewerCount, 10) || 0;
+      if (payload.schedule !== undefined && Array.isArray(payload.schedule)) {
+        stream.schedule = payload.schedule.map((item) => ({
+          id: item.id || ('ls-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)),
+          title: clean(item.title || '', 200),
+          day: clean(item.day || '', 30),
+          time: clean(item.time || '', 10),
+          date: clean(item.date || '', 10),
+          recurring: item.recurring !== false,
+          description: clean(item.description || '', 2000),
+        }));
+      }
+      stream.updatedAt = new Date().toISOString();
+      await setList(KEYS.stream, [stream]);
+      sendJson(res, { stream });
     }).catch(fail);
     return;
   }
