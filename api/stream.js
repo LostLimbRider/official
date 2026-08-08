@@ -1,6 +1,7 @@
 import { getList, setList, KEYS } from '../lib/storage.js';
 import { sendJson, sendEmpty, readBody, isAdmin, clean, getParam } from '../lib/http.js';
 import { seedStream } from '../lib/seed.js';
+import { autoArchive, normalizeKeep, publicArchive } from '../lib/stream.js';
 
 const FIELDS = [
   ['platform', 20],
@@ -37,6 +38,13 @@ export default function handler(req, res) {
     return;
   }
 
+  if (action === 'archive') {
+    publicArchive()
+      .then((archive) => sendJson(res, { archive }))
+      .catch(() => sendJson(res, { error: 'Storage error.' }, 500));
+    return;
+  }
+
   if (!isAdmin(req)) {
     return sendJson(res, { error: 'Admin access required.' }, 403);
   }
@@ -44,7 +52,8 @@ export default function handler(req, res) {
   readBody(req).then(async (payload) => {
     if (action === 'update' && req.method === 'POST') {
       const arr = await getList(KEYS.stream);
-      const stream = arr.length ? { ...arr[0] } : { ...seedStream };
+      const oldStream = arr.length ? { ...arr[0] } : { ...seedStream };
+      const stream = { ...oldStream };
 
       for (const [field, limit] of FIELDS) {
         if (payload[field] !== undefined) {
@@ -52,10 +61,16 @@ export default function handler(req, res) {
         }
       }
       if (payload.viewerCount !== undefined) stream.viewerCount = parseInt(payload.viewerCount, 10) || 0;
+      if (payload.archiveKeep !== undefined) stream.archiveKeep = normalizeKeep(payload.archiveKeep);
       if (stream.platform && !['youtube', 'facebook'].includes(stream.platform)) {
         return sendJson(res, { error: 'Platform must be youtube or facebook.' }, 422);
       }
+      if (stream.status === 'live' && oldStream.status !== 'live') {
+        stream.liveStartedAt = new Date().toISOString();
+      }
+      if (stream.status !== 'live') delete stream.liveStartedAt;
       stream.updatedAt = new Date().toISOString();
+      await autoArchive(oldStream, stream);
       await setList(KEYS.stream, [stream]);
       return sendJson(res, { stream });
     }

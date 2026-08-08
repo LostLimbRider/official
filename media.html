@@ -906,6 +906,13 @@
         </div>
 
         <div class="schedule-list" id="scheduleList"></div>
+
+        <div class="section-heading" style="margin-top:40px;">
+          <h2 class="section-title">Past <span class="orange">Streams</span></h2>
+          <p style="color:var(--muted); font-size:18px; line-height:1.5;">Replays of recent live streams. Recordings are kept for a limited time before being retired.</p>
+        </div>
+
+        <div class="schedule-list" id="archiveList"></div>
       </div>
     </section>
 
@@ -1188,6 +1195,64 @@
       } catch (e) { return dateStr; }
     }
 
+    // --- Stream Archive ---
+    let archiveItems = [];
+
+    async function loadArchive() {
+      try {
+        const res = await fetch('/api/stream?action=archive');
+        if (!res.ok) return;
+        const data = await res.json();
+        archiveItems = Array.isArray(data.archive) ? data.archive : [];
+        renderArchive();
+      } catch (e) {}
+    }
+
+    function renderArchive() {
+      const container = document.getElementById('archiveList');
+      if (!archiveItems.length) {
+        container.innerHTML = '<p style="color:var(--muted); font-size:14px; text-align:center; padding:20px;">No recorded streams yet.</p>';
+        return;
+      }
+      container.innerHTML = archiveItems.map(item => '' +
+        '<div class="schedule-item">' +
+          '<div class="schedule-day">' + escapeHtml(formatArchiveDate(item.date)) + '</div>' +
+          '<div class="schedule-info">' +
+            '<h4>' + escapeHtml(item.title || '') + '</h4>' +
+            '<p>' + escapeHtml(item.description || '') + '</p>' +
+          '</div>' +
+          '<button class="ep-play" onclick="watchRecording(\'' + item.id + '\')" aria-label="Watch recording">&#9654;</button>' +
+        '</div>'
+      ).join('');
+    }
+
+    function formatArchiveDate(iso) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch (e) { return iso; }
+    }
+
+    function watchRecording(id) {
+      const item = archiveItems.find(i => i.id === id);
+      if (!item || !item.url) return;
+      let src = '';
+      if (item.platform === 'youtube') {
+        src = 'https://www.youtube.com/embed/' + encodeURIComponent(item.url) + '?autoplay=1';
+      } else if (item.platform === 'facebook') {
+        src = 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(item.url) + '&show_text=false&autoplay=true';
+      } else {
+        window.open(item.url, '_blank', 'noopener');
+        return;
+      }
+      document.getElementById('modalVideo').src = src;
+      document.getElementById('modalTitle').textContent = item.title || 'Past Stream';
+      document.getElementById('modalMeta').textContent = 'Recorded \u2022 ' + formatArchiveDate(item.date);
+      document.getElementById('modalDesc').textContent = item.description || '';
+      document.getElementById('videoModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
     function loadFeatured() {
       const list = PODCASTS();
       const ep = list.find(p => p.featured) || list[0];
@@ -1437,6 +1502,7 @@
 
     fetchMedia();
     loadStream();
+    loadArchive();
   </script>
 </body>
 </html>

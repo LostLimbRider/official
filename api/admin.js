@@ -3,6 +3,7 @@ import { sendJson, sendEmpty, readBody, isAdmin, clean, getParam } from '../lib/
 import { buildNewsletter, getUpcomingEvents } from '../lib/newsletter.js';
 import { seedStream } from '../lib/seed.js';
 import { parseBrowser } from '../lib/ua.js';
+import { autoArchive, normalizeKeep, adminArchive, purgeExpired } from '../lib/stream.js';
 
 function getBrowserStats(visitors) {
   const stats = { Chrome: 0, Firefox: 0, Safari: 0, Edge: 0, Other: 0 };
@@ -90,10 +91,21 @@ export default function handler(req, res) {
     return;
   }
 
+  if (action === 'archive') {
+    adminArchive().then((data) => sendJson(res, data)).catch(fail);
+    return;
+  }
+
+  if (action === 'purge-archive' && req.method === 'POST') {
+    purgeExpired().then((data) => sendJson(res, data)).catch(fail);
+    return;
+  }
+
   if (action === 'update-stream' && req.method === 'POST') {
     readBody(req).then(async (payload) => {
       const arr = await getList(KEYS.stream);
-      const stream = arr.length ? { ...arr[0] } : { ...seedStream };
+      const oldStream = arr.length ? { ...arr[0] } : { ...seedStream };
+      const stream = { ...oldStream };
       const FIELDS = [['platform', 20], ['streamId', 200], ['title', 200], ['description', 2000], ['status', 20]];
       for (const [field, limit] of FIELDS) {
         if (payload[field] !== undefined) {
@@ -101,6 +113,11 @@ export default function handler(req, res) {
         }
       }
       if (payload.viewerCount !== undefined) stream.viewerCount = parseInt(payload.viewerCount, 10) || 0;
+      if (payload.archiveKeep !== undefined) stream.archiveKeep = normalizeKeep(payload.archiveKeep);
+      if (stream.status === 'live' && oldStream.status !== 'live') {
+        stream.liveStartedAt = new Date().toISOString();
+      }
+      if (stream.status !== 'live') delete stream.liveStartedAt;
       if (payload.schedule !== undefined && Array.isArray(payload.schedule)) {
         stream.schedule = payload.schedule.map((item) => ({
           id: item.id || ('ls-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8)),
@@ -113,6 +130,7 @@ export default function handler(req, res) {
         }));
       }
       stream.updatedAt = new Date().toISOString();
+      await autoArchive(oldStream, stream);
       await setList(KEYS.stream, [stream]);
       sendJson(res, { stream });
     }).catch(fail);

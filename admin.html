@@ -628,7 +628,7 @@
            </div>
 
            <div style="margin-bottom:14px;">
-             <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Stream ID (YouTube video ID or Twitch channel name)</label>
+             <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Stream ID (YouTube video ID or Facebook video URL)</label>
              <input id="smStreamId" maxlength="200" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="YouTube video ID or Facebook video URL">
            </div>
 
@@ -647,6 +647,10 @@
                <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Viewer Count</label>
                <input id="smViewers" type="number" min="0" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="0">
              </div>
+             <div>
+               <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Keep Last N Recordings</label>
+               <input id="smArchiveKeep" type="number" min="1" max="500" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="20">
+             </div>
            </div>
 
            <div style="margin-bottom:20px;">
@@ -660,6 +664,20 @@
              <button class="btn" style="background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.2);flex:1; justify-content:center;" onclick="goLive()">Go Live Now</button>
            </div>
            <div id="streamSaveStatus" style="margin-top:12px; font-size:13px; min-height:18px;"></div>
+         </div>
+
+         <div class="panel" style="margin-top:20px;">
+           <h3 style="color:var(--orange); font-size:14px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;">Stream Archive</h3>
+           <p style="color:var(--muted); font-size:13px; margin-bottom:16px;">
+             Ended live streams are archived automatically. You keep the most recent <span id="arcKeepLabel">20</span> recordings;
+             older ones are hidden from the public immediately and are removed permanently only after you approve the purge below.
+           </p>
+           <div id="archiveListAdmin" style="display:flex; flex-direction:column; gap:10px;"></div>
+           <div id="archiveEmpty" class="empty-state" style="display:none;">No archived streams yet.</div>
+           <div id="archivePurgeWrap" style="display:none; margin-top:16px;">
+             <button class="btn btn-danger" id="archivePurgeBtn" onclick="confirmPurgeArchive()">Approve &amp; Purge</button>
+           </div>
+           <div id="archiveStatus" style="margin-top:12px; font-size:13px; min-height:18px;"></div>
          </div>
        </div>
 
@@ -843,7 +861,7 @@
 
         if (name === 'subscribers') loadSubscribers();
         if (name === 'visitors') loadVisitors(1);
-        if (name === 'stream') loadStreamConfig();
+        if (name === 'stream') { loadStreamConfig(); loadArchive(); }
         if (name === 'events') loadEvents();
       }
 
@@ -1016,6 +1034,7 @@
          document.getElementById('smDesc').value = stream.description || '';
          document.getElementById('smStatus').value = stream.status || 'offline';
          document.getElementById('smViewers').value = stream.viewerCount || 0;
+         document.getElementById('smArchiveKeep').value = stream.archiveKeep || 20;
          renderScheduleAdmin(stream.schedule || []);
          status.textContent = '';
        } catch {
@@ -1055,6 +1074,7 @@
              description: document.getElementById('smDesc').value.trim(),
              status: document.getElementById('smStatus').value,
              viewerCount: parseInt(document.getElementById('smViewers').value, 10) || 0,
+             archiveKeep: parseInt(document.getElementById('smArchiveKeep').value, 10) || 20,
            })
          });
          if (!res.ok) { status.textContent = 'Save failed.'; return; }
@@ -1145,8 +1165,82 @@
              schedule: schedule,
            })
          });
-         loadStreamConfig();
-       } catch {}
+          loadStreamConfig();
+        } catch {}
+      }
+
+     // --- Stream Archive ---
+     async function loadArchive() {
+       const status = document.getElementById('archiveStatus');
+       status.textContent = 'Loading archive...';
+       try {
+         const res = await fetch(apiUrl('archive'));
+         if (!res.ok) { status.textContent = ''; return; }
+         const data = await res.json();
+         renderArchiveAdmin(data);
+         status.textContent = '';
+       } catch {
+         status.textContent = 'Connection error.';
+       }
+     }
+
+     function renderArchiveAdmin(data) {
+       const list = document.getElementById('archiveListAdmin');
+       const empty = document.getElementById('archiveEmpty');
+       const keep = data.keep || 20;
+       document.getElementById('arcKeepLabel').textContent = keep;
+       const archive = data.archive || [];
+       if (!archive.length) {
+         list.innerHTML = '';
+         empty.style.display = 'block';
+       } else {
+         empty.style.display = 'none';
+         list.innerHTML = archive.map(item => {
+           const badge = item.expired
+             ? '<span class="badge" style="background:rgba(239,68,68,.2); color:#ef4444;">Pending Purge</span>'
+             : '<span class="badge badge-clean">Active</span>';
+           const watchUrl = item.url ? (item.platform === 'youtube'
+             ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(item.url)
+             : item.url) : '#';
+           return '<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:rgba(255,255,255,.03);">' +
+             '<div style="flex:1; min-width:0;">' +
+               '<div style="font-size:14px; font-weight:700; color:var(--white); margin-bottom:2px;">' + escapeHtml(item.title || '') + '</div>' +
+               '<div style="font-size:12px; color:var(--muted);">' + escapeHtml(formatDate(item.date)) + ' \u2022 ' + escapeHtml(item.platform || '') + ' \u2022 ' + badge + '</div>' +
+             '</div>' +
+             (item.url ? '<a class="btn btn-sm" href="' + escapeHtml(watchUrl) + '" target="_blank" rel="noopener" style="white-space:nowrap;">Watch</a>' : '') +
+           '</div>';
+         }).join('');
+       }
+       const purgeWrap = document.getElementById('archivePurgeWrap');
+       const purgeBtn = document.getElementById('archivePurgeBtn');
+       if (data.pendingPurge > 0) {
+         purgeWrap.style.display = 'block';
+         purgeBtn.textContent = 'Approve &amp; Purge ' + data.pendingPurge + ' old recording' + (data.pendingPurge > 1 ? 's' : '');
+       } else {
+         purgeWrap.style.display = 'none';
+       }
+     }
+
+     async function confirmPurgeArchive() {
+       const status = document.getElementById('archiveStatus');
+       const match = (document.getElementById('archivePurgeBtn').textContent.match(/\d+/) || ['0']);
+       const count = parseInt(match[0], 10);
+       if (!count) return;
+       if (!confirm('This permanently removes ' + count + ' expired recording(s) from the archive. This cannot be undone. Approve the purge?')) return;
+       status.textContent = 'Purging...';
+       try {
+         const res = await fetch(apiUrl('purge-archive'), {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({})
+         });
+         if (!res.ok) { status.textContent = 'Purge failed.'; return; }
+         const data = await res.json();
+         status.textContent = 'Purged ' + data.purged + ' recording(s).';
+         loadArchive();
+       } catch {
+         status.textContent = 'Connection error.';
+       }
      }
 
       function loadAll() {
