@@ -1101,6 +1101,93 @@
       renderCoffeeTalk();
     }
 
+    // --- Live Stream ---
+    async function loadStream() {
+      try {
+        const res = await fetch('/api/stream?action=get');
+        if (!res.ok) return;
+        const data = await res.json();
+        const stream = data.stream || {};
+        renderLive(stream);
+        renderSchedule(stream.schedule || []);
+      } catch (e) {}
+    }
+
+    function renderLive(stream) {
+      const isLive = stream.status === 'live' && stream.streamId;
+      const badge = document.getElementById('liveBadge');
+      badge.textContent = isLive ? 'LIVE' : 'Offline';
+      badge.className = 'live-badge ' + (isLive ? 'live' : 'offline');
+
+      document.getElementById('liveTitle').textContent = stream.title || 'Lost Limb Riders Live';
+      document.getElementById('liveDesc').textContent = stream.description || '';
+
+      const frame = document.getElementById('liveFrame');
+      const placeholder = document.getElementById('livePlaceholder');
+
+      if (isLive) {
+        let embed = '';
+        if (stream.platform === 'youtube') {
+          embed = '<iframe src="https://www.youtube.com/embed/' + encodeURIComponent(stream.streamId) + '?autoplay=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+        } else if (stream.platform === 'facebook') {
+          embed = '<iframe src="https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(stream.streamId) + '&show_text=false&autoplay=true" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+        }
+        if (embed) {
+          const viewers = parseInt(stream.viewerCount, 10) || 0;
+          placeholder.style.display = 'none';
+          frame.innerHTML =
+            embed +
+            '<div class="live-overlay">' +
+              '<span class="live-dot"></span>' +
+              '<span class="status-text live-now">LIVE</span>' +
+              '<span class="viewer-count">' + viewers + ' watching</span>' +
+            '</div>';
+          return;
+        }
+      }
+
+      placeholder.style.display = 'flex';
+      frame.innerHTML = '';
+    }
+
+    function renderSchedule(schedule) {
+      const list = document.getElementById('scheduleList');
+      if (!schedule || !schedule.length) {
+        list.innerHTML = '<p style="color:var(--muted); font-size:14px; text-align:center; padding:20px;">No upcoming streams scheduled.</p>';
+        return;
+      }
+      list.innerHTML = schedule.map(item => {
+        const recurring = item.recurring !== false;
+        const day = recurring ? 'Every ' + (item.day || '') : (item.date ? formatShortDate(item.date) : (item.day || ''));
+        return '' +
+          '<div class="schedule-item">' +
+            '<div class="schedule-day">' + escapeHtml(day) + '</div>' +
+            '<div class="schedule-time">' + formatClock(item.time) + '</div>' +
+            '<div class="schedule-info">' +
+              '<h4>' + escapeHtml(item.title || '') + '</h4>' +
+              '<p>' + escapeHtml(item.description || '') + '</p>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function formatClock(time) {
+      if (!time) return '';
+      const parts = String(time).split(':');
+      const h = parseInt(parts[0], 10);
+      const m = parts[1] || '00';
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      return h12 + ':' + m + ' ' + ampm;
+    }
+
+    function formatShortDate(dateStr) {
+      if (!dateStr) return '';
+      try {
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      } catch (e) { return dateStr; }
+    }
+
     function loadFeatured() {
       const list = PODCASTS();
       const ep = list.find(p => p.featured) || list[0];
@@ -1349,6 +1436,7 @@
     });
 
     fetchMedia();
+    loadStream();
   </script>
 </body>
 </html>

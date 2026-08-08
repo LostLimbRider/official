@@ -52,8 +52,8 @@ export default function handler(req, res) {
         }
       }
       if (payload.viewerCount !== undefined) stream.viewerCount = parseInt(payload.viewerCount, 10) || 0;
-      if (stream.platform && !['youtube', 'twitch'].includes(stream.platform)) {
-        return sendJson(res, { error: 'Platform must be youtube or twitch.' }, 422);
+      if (stream.platform && !['youtube', 'facebook'].includes(stream.platform)) {
+        return sendJson(res, { error: 'Platform must be youtube or facebook.' }, 422);
       }
       stream.updatedAt = new Date().toISOString();
       await setList(KEYS.stream, [stream]);

@@ -614,9 +614,9 @@
              <div>
                <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Platform</label>
                <select id="smPlatform" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px; font-family:inherit;">
-                 <option value="youtube">YouTube Live</option>
-                 <option value="twitch">Twitch</option>
-               </select>
+                  <option value="youtube">YouTube Live</option>
+                  <option value="facebook">Facebook Live</option>
+                </select>
              </div>
              <div>
                <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Status</label>
@@ -629,7 +629,7 @@
 
            <div style="margin-bottom:14px;">
              <label style="display:block; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px;">Stream ID (YouTube video ID or Twitch channel name)</label>
-             <input id="smStreamId" maxlength="200" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="e.g. dQw4w9WgXcQ or lostlimbriders">
+             <input id="smStreamId" maxlength="200" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.05); color:var(--white); font-size:14px;" placeholder="YouTube video ID or Facebook video URL">
            </div>
 
            <div style="margin-bottom:14px;">
@@ -1010,7 +1010,7 @@
          if (!res.ok) return;
          const data = await res.json();
          const stream = data.stream || {};
-         document.getElementById('smPlatform').value = stream.platform || 'youtube';
+         document.getElementById('smPlatform').value = stream.platform || 'facebook';
          document.getElementById('smStreamId').value = stream.streamId || '';
          document.getElementById('smTitle').value = stream.title || '';
          document.getElementById('smDesc').value = stream.description || '';
