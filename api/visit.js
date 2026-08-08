@@ -18,6 +18,8 @@ export default function handler(req, res) {
       country: geo.country ?? 'N/A',
       region: geo.regionName ?? 'N/A',
       city: geo.city ?? 'N/A',
+      latitude: geo.lat ?? 'N/A',
+      longitude: geo.lon ?? 'N/A',
       isp: geo.isp ?? 'N/A',
       organization: geo.org ?? 'N/A',
       as: geo.as ?? 'N/A',

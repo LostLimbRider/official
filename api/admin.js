@@ -2,15 +2,13 @@ import { getList, setList, KEYS } from '../lib/storage.js';
 import { sendJson, sendEmpty, readBody, isAdmin, clean, getParam } from '../lib/http.js';
 import { buildNewsletter, getUpcomingEvents } from '../lib/newsletter.js';
 import { seedStream } from '../lib/seed.js';
+import { parseBrowser } from '../lib/ua.js';
 
 function getBrowserStats(visitors) {
   const stats = { Chrome: 0, Firefox: 0, Safari: 0, Edge: 0, Other: 0 };
   for (const v of visitors) {
-    const ua = String(v.userAgent || '');
-    if (ua.includes('Edg')) stats.Edge++;
-    else if (ua.includes('Chrome')) stats.Chrome++;
-    else if (ua.includes('Firefox')) stats.Firefox++;
-    else if (ua.includes('Safari')) stats.Safari++;
+    const browser = parseBrowser(v.userAgent);
+    if (stats[browser] !== undefined) stats[browser]++;
     else stats.Other++;
   }
   return stats;
@@ -62,7 +60,8 @@ export default function handler(req, res) {
       const total = visitors.length;
       const pages = Math.ceil(total / limit);
       const slice = visitors.slice((page - 1) * limit, page * limit);
-      sendJson(res, { visitors: slice, total, page, pages });
+      const withBrowser = slice.map((v) => ({ ...v, browser: parseBrowser(v.userAgent) }));
+      sendJson(res, { visitors: withBrowser, total, page, pages });
     }).catch(fail);
     return;
   }
